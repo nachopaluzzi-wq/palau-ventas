@@ -1,0 +1,396 @@
+{
+  "captured_at": "2026-09-30",
+  "app_id": "6ab44f946746388d9ad48b68",
+  "phase": "post_schema_atomic_flow",
+  "schemas": [
+    {
+      "entity_name": "CuentaCorriente",
+      "entity_schema": {
+        "name": "CuentaCorriente",
+        "type": "object",
+        "properties": {
+          "debe_centavos": {
+            "default": 0,
+            "type": "integer"
+          },
+          "detalle_auditoria": {
+            "description": "Solo en 'Ver detalle / auditoría' y exportación completa",
+            "type": "string"
+          },
+          "estado": {
+            "default": "PARA_REVISAR",
+            "enum": [
+              "CONFIRMADO",
+              "PARA_REVISAR"
+            ],
+            "type": "string"
+          },
+          "evidencia": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "haber_centavos": {
+            "default": 0,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "nota_corta": {
+            "description": "Se muestra en la vista simple",
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "sucursal_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipo": {
+            "enum": [
+              "SALDO_INICIAL",
+              "REGULARIZACION_HISTORICA",
+              "NOTA_DEBITO",
+              "NOTA_CREDITO",
+              "AJUSTE",
+              "VENTA",
+              "COBRANZA",
+              "REVERSA_VENTA",
+              "REVERSA_COBRANZA"
+            ],
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pagador_id",
+          "fecha",
+          "tipo",
+          "idempotency_key",
+          "estado"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "MovimientoStock",
+      "entity_schema": {
+        "name": "MovimientoStock",
+        "type": "object",
+        "properties": {
+          "costos_centavos": {
+            "default": [],
+            "description": "Costo unitario por item (mismo orden). Solo Admin.",
+            "items": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "type": "array",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            }
+          },
+          "destino_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO",
+              "PARA_REVISAR"
+            ],
+            "type": "string"
+          },
+          "evidencia": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "articulo_id": {
+                  "type": "string"
+                },
+                "cantidad_unidades": {
+                  "type": "integer"
+                },
+                "packs": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "sueltas": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "origen_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipo": {
+            "enum": [
+              "SALDO_INICIAL",
+              "COMPRA",
+              "CARGA_CAMION",
+              "DESCARGA_CAMION",
+              "TRANSFERENCIA",
+              "ROTURA",
+              "AJUSTE_CONTEO",
+              "DEVOLUCION_CLIENTE",
+              "CONSIGNACION_SALIDA",
+              "CONSIGNACION_DEVOLUCION",
+              "REMITO_SALIDA",
+              "REMITO_REVERSION"
+            ],
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "tipo",
+          "items",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.usuario_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "OperacionRemito",
+      "entity_schema": {
+        "name": "OperacionRemito",
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PREPARANDO",
+              "APLICANDO",
+              "CONFIRMADA",
+              "REVERSANDO",
+              "ANULADA",
+              "ERROR"
+            ]
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          },
+          "remito_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movimiento_stock_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cc_venta_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cobranza_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cc_cobranza_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "anulacion_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movimiento_reversion_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cc_reversa_venta_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "intentos": {
+            "type": "integer",
+            "default": 0
+          },
+          "payload_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "referencia": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dispositivo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "idempotency_key",
+          "estado",
+          "fecha"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
