@@ -1,0 +1,1520 @@
+{
+  "checkpoint": "BASE44_PRE_ATOMIC_2026-09-30",
+  "app_id": "6ab44f946746388d9ad48b68",
+  "scope": "core_transactional",
+  "schemas": [
+    {
+      "entity_name": "PresupuestoItem",
+      "entity_schema": {
+        "name": "PresupuestoItem",
+        "type": "object",
+        "properties": {
+          "presupuesto_id": {
+            "type": "string"
+          },
+          "articulo": {
+            "type": "string"
+          },
+          "cantidad": {
+            "type": "number"
+          },
+          "precio_unitario": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "presupuesto_id",
+          "articulo",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "Anulacion",
+      "entity_schema": {
+        "name": "Anulacion",
+        "properties": {
+          "documento_id": {
+            "type": "string"
+          },
+          "documento_tipo": {
+            "enum": [
+              "Remito",
+              "Cobranza",
+              "MovimientoStock",
+              "CuentaCorriente"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "documento_tipo",
+          "documento_id",
+          "fecha",
+          "motivo",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "CajaMovimiento",
+      "entity_schema": {
+        "name": "CajaMovimiento",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "ingreso",
+              "egreso"
+            ]
+          },
+          "concepto": {
+            "type": "string"
+          },
+          "monto": {
+            "type": "number"
+          },
+          "medio_pago": {
+            "type": "string"
+          },
+          "usuario": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "tipo",
+          "concepto",
+          "monto"
+        ]
+      }
+    },
+    {
+      "entity_name": "Cobranza",
+      "entity_schema": {
+        "name": "Cobranza",
+        "properties": {
+          "destino": {
+            "default": "CAJA_VENDEDOR",
+            "enum": [
+              "CAJA_VENDEDOR",
+              "CAJA_CENTRAL",
+              "BANCO"
+            ],
+            "type": "string"
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "importe_centavos": {
+            "type": "integer"
+          },
+          "imputaciones": {
+            "default": [],
+            "items": {
+              "properties": {
+                "importe_centavos": {
+                  "type": "integer"
+                },
+                "remito_id": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "medio": {
+            "enum": [
+              "efectivo",
+              "transferencia",
+              "mercado_pago",
+              "cheque",
+              "echeq",
+              "otro"
+            ],
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "origen": {
+            "default": "APP",
+            "enum": [
+              "APP",
+              "HISTORICO"
+            ],
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "pagador_nombre": {
+            "type": "string"
+          },
+          "recibido_por_nombre": {
+            "type": "string"
+          },
+          "recibido_por_socio_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "recibido_por_user_id": {
+            "type": "string"
+          },
+          "referencia": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pagador_id",
+          "fecha",
+          "importe_centavos",
+          "medio",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.recibido_por_user_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "RemitoItem",
+      "entity_schema": {
+        "name": "RemitoItem",
+        "type": "object",
+        "properties": {
+          "remito_id": {
+            "type": "string"
+          },
+          "articulo": {
+            "type": "string"
+          },
+          "cantidad": {
+            "type": "number"
+          },
+          "precio_unitario": {
+            "type": "number"
+          },
+          "costo_unitario": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "margen": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "remito_id",
+          "articulo",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "Movimiento",
+      "entity_schema": {
+        "name": "Movimiento",
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "title": "Tipo",
+            "enum": [
+              "entrada",
+              "salida",
+              "ajuste"
+            ],
+            "default": "entrada"
+          },
+          "articulo_id": {
+            "type": "string",
+            "title": "Artículo ID"
+          },
+          "articulo_nombre": {
+            "type": "string",
+            "title": "Artículo"
+          },
+          "cantidad": {
+            "type": "number",
+            "title": "Cantidad"
+          },
+          "motivo": {
+            "type": "string",
+            "title": "Motivo"
+          },
+          "proveedor": {
+            "type": "string",
+            "title": "Proveedor"
+          },
+          "orden_compra_id": {
+            "type": "string",
+            "title": "Orden de compra"
+          },
+          "stock_resultante": {
+            "type": "number",
+            "title": "Stock resultante"
+          }
+        },
+        "required": [
+          "tipo",
+          "articulo_id",
+          "articulo_nombre",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "MovimientoStock",
+      "entity_schema": {
+        "name": "MovimientoStock",
+        "properties": {
+          "costos_centavos": {
+            "default": [],
+            "description": "Costo unitario por item (mismo orden). Solo Admin.",
+            "items": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": "array"
+          },
+          "destino_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO",
+              "PARA_REVISAR"
+            ],
+            "type": "string"
+          },
+          "evidencia": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "articulo_id": {
+                  "type": "string"
+                },
+                "cantidad_unidades": {
+                  "type": "integer"
+                },
+                "packs": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "sueltas": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "origen_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipo": {
+            "enum": [
+              "SALDO_INICIAL",
+              "COMPRA",
+              "CARGA_CAMION",
+              "DESCARGA_CAMION",
+              "TRANSFERENCIA",
+              "ROTURA",
+              "AJUSTE_CONTEO",
+              "DEVOLUCION_CLIENTE",
+              "CONSIGNACION_SALIDA",
+              "CONSIGNACION_DEVOLUCION"
+            ],
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "tipo",
+          "items",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.usuario_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Presupuesto",
+      "entity_schema": {
+        "name": "Presupuesto",
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "string"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cliente": {
+            "type": "string"
+          },
+          "vendedor": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "borrador",
+              "enviado",
+              "aceptado",
+              "vencido",
+              "convertido"
+            ],
+            "default": "borrador"
+          },
+          "total": {
+            "type": "number"
+          },
+          "vigencia_hasta": {
+            "type": "string",
+            "format": "date"
+          },
+          "remito_generado": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "numero",
+          "fecha",
+          "cliente",
+          "vendedor"
+        ]
+      }
+    },
+    {
+      "entity_name": "Remito",
+      "entity_schema": {
+        "name": "Remito",
+        "properties": {
+          "cliente_id": {
+            "type": "string"
+          },
+          "cliente_nombre": {
+            "type": "string"
+          },
+          "direccion_entrega": {
+            "type": "string"
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "articulo_id": {
+                  "type": "string"
+                },
+                "cantidad_ingresada": {
+                  "type": "integer"
+                },
+                "cantidad_unidades": {
+                  "type": "integer"
+                },
+                "descripcion": {
+                  "type": "string"
+                },
+                "importe_centavos": {
+                  "type": "integer"
+                },
+                "iva_alicuota": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "precio_pack_centavos": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "precio_unitario_centavos": {
+                  "type": "integer"
+                },
+                "precio_version_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "unidad_ingreso": {
+                  "enum": [
+                    "unidad",
+                    "pack",
+                    "pallet"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "lista_codigo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lista_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "motivo_sin_cargo": {
+            "enum": [
+              "bonificacion",
+              "muestra",
+              "reposicion",
+              "promocion",
+              "publicidad",
+              "cortesia",
+              "otro",
+              null
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "numero": {
+            "type": "string"
+          },
+          "numero_original": {
+            "description": "Número del papel/sistema anterior",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "operacion_id": {
+            "description": "Agrupa ventas de una misma operación (ej. dos pagadores)",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "origen": {
+            "default": "APP",
+            "enum": [
+              "APP",
+              "HISTORICO"
+            ],
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "pagador_nombre": {
+            "type": "string"
+          },
+          "punto_venta_id": {
+            "type": "string"
+          },
+          "sin_cargo": {
+            "default": false,
+            "type": "boolean"
+          },
+          "sucursal_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sucursal_nombre": {
+            "type": "string"
+          },
+          "total_centavos": {
+            "type": "integer"
+          },
+          "ubicacion_origen_id": {
+            "type": "string"
+          },
+          "vendedor_nombre": {
+            "type": "string"
+          },
+          "vendedor_user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "punto_venta_id",
+          "fecha",
+          "cliente_id",
+          "pagador_id",
+          "ubicacion_origen_id",
+          "items",
+          "total_centavos",
+          "idempotency_key"
+        ],
+        "type": "object",
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.vendedor_user_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "CuentaCorriente",
+      "entity_schema": {
+        "name": "CuentaCorriente",
+        "properties": {
+          "debe_centavos": {
+            "default": 0,
+            "type": "integer"
+          },
+          "detalle_auditoria": {
+            "description": "Solo en 'Ver detalle / auditoría' y exportación completa",
+            "type": "string"
+          },
+          "estado": {
+            "default": "PARA_REVISAR",
+            "enum": [
+              "CONFIRMADO",
+              "PARA_REVISAR"
+            ],
+            "type": "string"
+          },
+          "evidencia": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "haber_centavos": {
+            "default": 0,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "nota_corta": {
+            "description": "Se muestra en la vista simple",
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "sucursal_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipo": {
+            "enum": [
+              "SALDO_INICIAL",
+              "REGULARIZACION_HISTORICA",
+              "NOTA_DEBITO",
+              "NOTA_CREDITO",
+              "AJUSTE"
+            ],
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pagador_id",
+          "fecha",
+          "tipo",
+          "idempotency_key",
+          "estado"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Auditoria",
+      "entity_schema": {
+        "name": "Auditoria",
+        "properties": {
+          "accion": {
+            "type": "string"
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "entidad": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "registro_id": {
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          },
+          "valor_anterior": {
+            "type": "string"
+          },
+          "valor_nuevo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "accion",
+          "entidad"
+        ],
+        "rls": {
+          "create": {},
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    }
+  ],
+  "data": {
+    "Remito": [
+      {
+        "fecha": "2026-09-30T17:14:30Z",
+        "cliente_id": "6abd432e5e740b4ec25e424c",
+        "dispositivo": null,
+        "lista_codigo": "PACK",
+        "observacion": null,
+        "punto_venta_id": "6abc8520891548551eab82e7",
+        "vendedor_user_id": null,
+        "direccion_entrega": null,
+        "idempotency_key": "PALAU-EXT-20260930-PRADO-16800",
+        "sin_cargo": false,
+        "numero_original": null,
+        "operacion_id": "PALAU-EXT-20260930-PRADO-16800",
+        "ubicacion_origen_id": "6abc851abb58da8ba7829b41",
+        "cliente_nombre": "Prado",
+        "motivo_sin_cargo": null,
+        "total_centavos": 1680000,
+        "estado": "CONFIRMADO",
+        "items": [
+          {
+            "precio_version_id": "6abd43438b6536d01f6d61b1",
+            "articulo_id": "6abc8517acd7c0e10bc3ff87",
+            "cantidad_unidades": 12,
+            "cantidad_ingresada": 1,
+            "precio_unitario_centavos": 50000,
+            "iva_alicuota": null,
+            "importe_centavos": 600000,
+            "precio_pack_centavos": 600000,
+            "descripcion": "Agua sin gas 500 cc",
+            "unidad_ingreso": "pack"
+          },
+          {
+            "precio_version_id": "6abd43438b6536d01f6d61b3",
+            "articulo_id": "6abc8517acd7c0e10bc3ff89",
+            "cantidad_unidades": 12,
+            "cantidad_ingresada": 2,
+            "precio_unitario_centavos": 90000,
+            "iva_alicuota": null,
+            "importe_centavos": 1080000,
+            "precio_pack_centavos": 540000,
+            "descripcion": "Agua sin gas 1,5 L",
+            "unidad_ingreso": "pack"
+          }
+        ],
+        "lista_id": "6abc85185618c4cad9285612",
+        "numero": "0004",
+        "pagador_nombre": "Prado",
+        "origen": "APP",
+        "vendedor_nombre": "Enzo",
+        "sucursal_id": null,
+        "pagador_id": "6abd432e5e740b4ec25e424c",
+        "sucursal_nombre": "Prado",
+        "id": "6abd436d49d99867dee7099e",
+        "created_date": "2026-09-30T17:14:21.216000",
+        "updated_date": "2026-09-30T17:14:21.216000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "fecha": "2026-09-29T14:06:35Z",
+        "cliente_id": "6abcbe22f12f14b3b2092de9",
+        "dispositivo": null,
+        "lista_codigo": "PACK",
+        "observacion": "Remito original #11. Evidencia de chat aportada por el usuario. Entrega: 1 pack 500 cc S/G + 2 packs 1,5 L S/G.",
+        "punto_venta_id": "6abc8520891548551eab82e7",
+        "vendedor_user_id": "6ab44f976746388d9ad48b6e",
+        "direccion_entrega": null,
+        "idempotency_key": "remito-historico-falcon-original-11-2026-09-29",
+        "sin_cargo": false,
+        "numero_original": "11",
+        "operacion_id": null,
+        "ubicacion_origen_id": "6abc851abb58da8ba7829b40",
+        "cliente_nombre": "Parque Falcon",
+        "motivo_sin_cargo": null,
+        "total_centavos": 1824000,
+        "estado": "CONFIRMADO",
+        "items": [
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff87",
+            "cantidad_unidades": 12,
+            "cantidad_ingresada": 1,
+            "precio_unitario_centavos": 55000,
+            "iva_alicuota": null,
+            "importe_centavos": 660000,
+            "precio_pack_centavos": 660000,
+            "descripcion": "Agua Palau 500 cc sin gas",
+            "unidad_ingreso": "pack"
+          },
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff89",
+            "cantidad_unidades": 12,
+            "cantidad_ingresada": 2,
+            "precio_unitario_centavos": 97000,
+            "iva_alicuota": null,
+            "importe_centavos": 1164000,
+            "precio_pack_centavos": 582000,
+            "descripcion": "Agua Palau 1.500 cc sin gas",
+            "unidad_ingreso": "pack"
+          }
+        ],
+        "lista_id": "6abc85185618c4cad9285612",
+        "numero": "0003",
+        "pagador_nombre": "Parque Falcon",
+        "origen": "HISTORICO",
+        "vendedor_nombre": "Nacho Paluzzi",
+        "sucursal_id": null,
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "sucursal_nombre": "Parque Falcon",
+        "id": "6abcbfc1ae195a3d6d9258bb",
+        "created_date": "2026-09-30T07:52:33.080000",
+        "updated_date": "2026-09-30T07:52:33.080000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "fecha": "2026-09-30T10:00:00Z",
+        "cliente_id": "6abcbe22f12f14b3b2092de9",
+        "dispositivo": null,
+        "lista_codigo": "PACK",
+        "observacion": null,
+        "punto_venta_id": "6abc8520891548551eab82e7",
+        "vendedor_user_id": "6ab44f976746388d9ad48b6e",
+        "direccion_entrega": null,
+        "idempotency_key": "remito-0001-2026-09-30",
+        "sin_cargo": false,
+        "numero_original": null,
+        "operacion_id": null,
+        "ubicacion_origen_id": "6abc851abb58da8ba7829b40",
+        "cliente_nombre": "Parque Falcon",
+        "motivo_sin_cargo": null,
+        "total_centavos": 2760000,
+        "estado": "CONFIRMADO",
+        "items": [
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff87",
+            "cantidad_unidades": 24,
+            "cantidad_ingresada": 2,
+            "precio_unitario_centavos": 55000,
+            "iva_alicuota": null,
+            "importe_centavos": 1320000,
+            "precio_pack_centavos": 660000,
+            "descripcion": "Agua sin gas 500 cc",
+            "unidad_ingreso": "pack"
+          },
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff88",
+            "cantidad_unidades": 12,
+            "cantidad_ingresada": 1,
+            "precio_unitario_centavos": 71500,
+            "iva_alicuota": null,
+            "importe_centavos": 858000,
+            "precio_pack_centavos": 858000,
+            "descripcion": "Agua con gas (soda) 500 cc",
+            "unidad_ingreso": "pack"
+          },
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff89",
+            "cantidad_unidades": 6,
+            "cantidad_ingresada": 1,
+            "precio_unitario_centavos": 97000,
+            "iva_alicuota": null,
+            "importe_centavos": 582000,
+            "precio_pack_centavos": 582000,
+            "descripcion": "Agua sin gas 1,5 L",
+            "unidad_ingreso": "pack"
+          }
+        ],
+        "lista_id": "6abc85185618c4cad9285612",
+        "numero": "0001",
+        "pagador_nombre": "Parque Falcon",
+        "origen": "HISTORICO",
+        "vendedor_nombre": "Sistema",
+        "sucursal_id": null,
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "sucursal_nombre": "Parque Falcon",
+        "id": "6abcbe529da51b2746ce68e5",
+        "created_date": "2026-09-30T07:46:26.196000",
+        "updated_date": "2026-09-30T07:46:26.196000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "fecha": "2026-09-30T11:00:00Z",
+        "cliente_id": "6abcbe22f12f14b3b2092dea",
+        "dispositivo": null,
+        "lista_codigo": "PACK",
+        "observacion": null,
+        "punto_venta_id": "6abc8520891548551eab82e7",
+        "vendedor_user_id": "6ab44f976746388d9ad48b6e",
+        "direccion_entrega": null,
+        "idempotency_key": "remito-0002-2026-09-30",
+        "sin_cargo": false,
+        "numero_original": null,
+        "operacion_id": null,
+        "ubicacion_origen_id": "6abc851abb58da8ba7829b40",
+        "cliente_nombre": "Parque Rosas",
+        "motivo_sin_cargo": null,
+        "total_centavos": 2760000,
+        "estado": "CONFIRMADO",
+        "items": [
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff87",
+            "cantidad_unidades": 24,
+            "cantidad_ingresada": 2,
+            "precio_unitario_centavos": 55000,
+            "iva_alicuota": null,
+            "importe_centavos": 1320000,
+            "precio_pack_centavos": 660000,
+            "descripcion": "Agua sin gas 500 cc",
+            "unidad_ingreso": "pack"
+          },
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff88",
+            "cantidad_unidades": 12,
+            "cantidad_ingresada": 1,
+            "precio_unitario_centavos": 71500,
+            "iva_alicuota": null,
+            "importe_centavos": 858000,
+            "precio_pack_centavos": 858000,
+            "descripcion": "Agua con gas (soda) 500 cc",
+            "unidad_ingreso": "pack"
+          },
+          {
+            "precio_version_id": null,
+            "articulo_id": "6abc8517acd7c0e10bc3ff89",
+            "cantidad_unidades": 6,
+            "cantidad_ingresada": 1,
+            "precio_unitario_centavos": 97000,
+            "iva_alicuota": null,
+            "importe_centavos": 582000,
+            "precio_pack_centavos": 582000,
+            "descripcion": "Agua sin gas 1,5 L",
+            "unidad_ingreso": "pack"
+          }
+        ],
+        "lista_id": "6abc85185618c4cad9285612",
+        "numero": "0002",
+        "pagador_nombre": "Parque Rosas",
+        "origen": "HISTORICO",
+        "vendedor_nombre": "Sistema",
+        "sucursal_id": null,
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "sucursal_nombre": "Parque Rosas",
+        "id": "6abcbe529da51b2746ce68e6",
+        "created_date": "2026-09-30T07:46:26.196000",
+        "updated_date": "2026-09-30T07:46:26.196000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "RemitoItem": [],
+    "Cobranza": [
+      {
+        "observacion": "Cobranza total confirmada por el usuario. Medio de pago no informado; registrado como 'otro' hasta contar con ese dato.",
+        "referencia": "Remito 0004",
+        "estado": "CONFIRMADO",
+        "recibido_por_nombre": "Enzo",
+        "importe_centavos": 1680000,
+        "imputaciones": [
+          {
+            "remito_id": "6abd436d49d99867dee7099e",
+            "importe_centavos": 1680000
+          }
+        ],
+        "origen": "APP",
+        "pagador_id": "6abd432e5e740b4ec25e424c",
+        "pagador_nombre": "Prado",
+        "destino": "CAJA_VENDEDOR",
+        "dispositivo": null,
+        "fecha": "2026-09-30T17:14:30Z",
+        "idempotency_key": "COBRO-PALAU-EXT-20260930-PRADO-16800",
+        "recibido_por_socio_id": "6abc851b50f345f3282df55d",
+        "recibido_por_user_id": null,
+        "medio": "otro",
+        "id": "6abd437a116308f725410c31",
+        "created_date": "2026-09-30T17:14:34.856000",
+        "updated_date": "2026-09-30T18:01:18.205000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "observacion": "Pago en efectivo confirmado por el usuario. Cancela $28.280 de saldo anterior + $18.240 del remito original #11. Saldo final informado: $0.",
+        "referencia": "Cancelación total Parque Falcon 29-09-2026",
+        "estado": "CONFIRMADO",
+        "recibido_por_nombre": null,
+        "importe_centavos": 4652000,
+        "imputaciones": [
+          {
+            "remito_id": "6abcbfc1ae195a3d6d9258bb",
+            "importe_centavos": 1824000
+          }
+        ],
+        "origen": "HISTORICO",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "pagador_nombre": "Parque Falcon",
+        "destino": "CAJA_VENDEDOR",
+        "dispositivo": null,
+        "fecha": "2026-09-29T14:06:35Z",
+        "idempotency_key": "cobranza-falcon-46520-efectivo-2026-09-29",
+        "recibido_por_socio_id": null,
+        "recibido_por_user_id": "6ab44f976746388d9ad48b6e",
+        "medio": "efectivo",
+        "id": "6abcbfcd1f2c850c0be9828d",
+        "created_date": "2026-09-30T07:52:45.984000",
+        "updated_date": "2026-09-30T07:52:45.984000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "MovimientoStock": [
+      {
+        "usuario_nombre": "Sistema",
+        "idempotency_key": "saldo-inicial-camion-2026-09-30",
+        "estado": "CONFIRMADO",
+        "costos_centavos": [],
+        "dispositivo": null,
+        "tipo": "SALDO_INICIAL",
+        "fecha": "2026-09-30T00:00:00Z",
+        "documento": null,
+        "destino_id": "6abc851abb58da8ba7829b41",
+        "motivo": "Saldo inicial cargado desde historial (30-09-2026)",
+        "origen_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "evidencia": null,
+        "items": [
+          {
+            "cantidad_unidades": 552,
+            "articulo_id": "6abc8517acd7c0e10bc3ff87",
+            "packs": 46,
+            "sueltas": null
+          },
+          {
+            "cantidad_unidades": 3018,
+            "articulo_id": "6abc8517acd7c0e10bc3ff88",
+            "packs": 251,
+            "sueltas": 6
+          },
+          {
+            "cantidad_unidades": 1452,
+            "articulo_id": "6abc8517acd7c0e10bc3ff89",
+            "packs": 242,
+            "sueltas": null
+          },
+          {
+            "cantidad_unidades": 291,
+            "articulo_id": "6abc8517acd7c0e10bc3ff8a",
+            "packs": null,
+            "sueltas": null
+          }
+        ],
+        "id": "6abcbe3dcf6ede7ed54879b2",
+        "created_date": "2026-09-30T07:46:05.764000",
+        "updated_date": "2026-09-30T07:46:05.764000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "Movimiento": [],
+    "CuentaCorriente": [
+      {
+        "debe_centavos": 6840000,
+        "haber_centavos": 0,
+        "referencia": "Charly (sin documentación)",
+        "nota_corta": "Regularización histórica sin evidencia",
+        "idempotency_key": "cc-regularizacion-charly-68400",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "fecha": "2026-09-30T00:00:00Z",
+        "estado": "PARA_REVISAR",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": null,
+        "evidencia": null,
+        "pagador_id": "6abcbffec64e396bbcaacfc3",
+        "id": "6abcc002f56792d5b06a854d",
+        "created_date": "2026-09-30T07:53:38.100000",
+        "updated_date": "2026-09-30T07:53:38.100000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "debe_centavos": 0,
+        "haber_centavos": 2760000,
+        "referencia": "Anulación Remito 0001",
+        "nota_corta": "Reversión de carga histórica incorrecta",
+        "idempotency_key": "cc-reversa-remito-0001-falcon-2026-09-30",
+        "tipo": "AJUSTE",
+        "fecha": "2026-09-30T07:50:00Z",
+        "estado": "CONFIRMADO",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": "Revierte el débito de $27.600 asociado al remito 0001 cargado incorrectamente. Se conserva el documento anulado para auditoría.",
+        "evidencia": null,
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "id": "6abcbfbfc6e3e9815be58616",
+        "created_date": "2026-09-30T07:52:31.101000",
+        "updated_date": "2026-09-30T07:52:31.101000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "debe_centavos": 2828000,
+        "haber_centavos": 0,
+        "referencia": "Saldo anterior confirmado en chat",
+        "nota_corta": "Saldo anterior Parque Falcon: $28.280",
+        "idempotency_key": "cc-saldo-previo-falcon-28280-2026-09-29",
+        "tipo": "SALDO_INICIAL",
+        "fecha": "2026-09-29T14:00:00Z",
+        "estado": "CONFIRMADO",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": "Evidencia del 29-09-2026: antes del remito #11 se informó +$28.280, totalizando $46.520 con la nueva entrega.",
+        "evidencia": null,
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "id": "6abcbfbfc6e3e9815be58617",
+        "created_date": "2026-09-30T07:52:31.101000",
+        "updated_date": "2026-09-30T07:52:31.101000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "debe_centavos": 4210000,
+        "haber_centavos": 0,
+        "referencia": "Historial previo",
+        "nota_corta": "Saldo inicial histórico Parque Rosas",
+        "idempotency_key": "cc-saldo-inicial-rosas-2026-09-30",
+        "tipo": "SALDO_INICIAL",
+        "fecha": "2026-09-30T07:00:00Z",
+        "estado": "CONFIRMADO",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": null,
+        "evidencia": null,
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "id": "6abcbe5fd6801a254c91fe01",
+        "created_date": "2026-09-30T07:46:39.370000",
+        "updated_date": "2026-09-30T07:46:39.370000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "debe_centavos": 2760000,
+        "haber_centavos": 0,
+        "referencia": "Remito 0002",
+        "nota_corta": "Remito 0002 del 30-09",
+        "idempotency_key": "cc-remito-0002-rosas",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "fecha": "2026-09-30T12:00:00Z",
+        "estado": "CONFIRMADO",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": null,
+        "evidencia": null,
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "id": "6abcbe5fd6801a254c91fe02",
+        "created_date": "2026-09-30T07:46:39.370000",
+        "updated_date": "2026-09-30T07:46:39.370000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "debe_centavos": 0,
+        "haber_centavos": 5000000,
+        "referencia": "Efectivo",
+        "nota_corta": "Pago efectivo recibido por Enzo",
+        "idempotency_key": "cc-pago-rosas-2026-09-30",
+        "tipo": "AJUSTE",
+        "fecha": "2026-09-30T15:00:00Z",
+        "estado": "CONFIRMADO",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": null,
+        "evidencia": null,
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "id": "6abcbe5fd6801a254c91fe03",
+        "created_date": "2026-09-30T07:46:39.370000",
+        "updated_date": "2026-09-30T07:46:39.370000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "debe_centavos": 2760000,
+        "haber_centavos": 0,
+        "referencia": "Remito 0001",
+        "nota_corta": "Remito 0001 del 30-09",
+        "idempotency_key": "cc-remito-0001-falcon",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "fecha": "2026-09-30T10:30:00Z",
+        "estado": "CONFIRMADO",
+        "sucursal_id": null,
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "detalle_auditoria": null,
+        "evidencia": null,
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "id": "6abcbe5fd6801a254c91fe04",
+        "created_date": "2026-09-30T07:46:39.370000",
+        "updated_date": "2026-09-30T07:46:39.370000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "Presupuesto": [],
+    "PresupuestoItem": [],
+    "Anulacion": [
+      {
+        "idempotency_key": "anula-remito-0001-falcon-evidencia-2026-09-30",
+        "fecha": "2026-09-30T07:50:00Z",
+        "motivo": "Anulación de carga histórica incorrecta. Evidencia posterior: remito original #11 de Parque Falcon del 29-09-2026 por $18.240.",
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "usuario_nombre": "Nacho Paluzzi",
+        "documento_id": "6abcbe529da51b2746ce68e5",
+        "documento_tipo": "Remito",
+        "id": "6abcbfbde2e3a343f5d37b69",
+        "created_date": "2026-09-30T07:52:29.105000",
+        "updated_date": "2026-09-30T07:52:29.105000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "Auditoria": [
+      {
+        "documento": "0004",
+        "valor_anterior": "recibido_por_socio_id = null; recibido_por_nombre = Enzo",
+        "dispositivo": null,
+        "fecha": "2026-09-30T18:01:18Z",
+        "accion": "CORREGIR_TRAZABILIDAD_COBRANZA",
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "usuario_nombre": "Ignacio / ChatGPT",
+        "entidad": "Cobranza",
+        "motivo": "Vincular la cobranza de Prado al socio Enzo por ID, según dato operativo confirmado.",
+        "valor_nuevo": "recibido_por_socio_id = 6abc851b50f345f3282df55d (Enzo); recibido_por_nombre = Enzo",
+        "registro_id": "6abd437a116308f725410c31",
+        "id": "6abd4e7acd6a9c2990956132",
+        "created_date": "2026-09-30T18:01:30.597000",
+        "updated_date": "2026-09-30T18:01:30.597000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "documento": "0004",
+        "valor_anterior": "",
+        "dispositivo": null,
+        "fecha": "2026-09-30T17:14:30Z",
+        "accion": "CREAR_REMITO",
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "usuario_nombre": "Ignacio / ChatGPT",
+        "entidad": "Remito",
+        "motivo": "Operación real informada por el usuario. Prado: 1 pack 500 S/G + 2 packs 1,5 S/G; salida del stock de Enzo.",
+        "valor_nuevo": "Total $16.800; origen stock Camión/Enzo; referencia PALAU-EXT-20260930-PRADO-16800",
+        "registro_id": "6abd436d49d99867dee7099e",
+        "id": "6abd438ce2bfa04724ffc846",
+        "created_date": "2026-09-30T17:14:52.833000",
+        "updated_date": "2026-09-30T17:14:52.833000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "documento": "0004",
+        "valor_anterior": "",
+        "dispositivo": null,
+        "fecha": "2026-09-30T17:14:30Z",
+        "accion": "REGISTRAR_COBRANZA",
+        "usuario_id": "6ab44f976746388d9ad48b6e",
+        "usuario_nombre": "Ignacio / ChatGPT",
+        "entidad": "Cobranza",
+        "motivo": "Cobranza total de la operación Prado recibida por Enzo.",
+        "valor_nuevo": "$16.800; medio no informado (registrado como otro); imputación completa al remito 0004",
+        "registro_id": "6abd437a116308f725410c31",
+        "id": "6abd438ce2bfa04724ffc847",
+        "created_date": "2026-09-30T17:14:52.833000",
+        "updated_date": "2026-09-30T17:14:52.833000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "CajaMovimiento": []
+  }
+}
