@@ -1,0 +1,1000 @@
+PALAU VENTAS — ESPECIFICACIÓN MAESTRA DEFINITIVA
+
+OBJETIVO GENERAL
+
+Evolucionar Palau Ventas sin romper la operatoria actual y convertirlo en un sistema profesional de distribución, stock, clientes, precios, costos, compras, cobranzas, contabilidad de gestión, rentabilidad, socios, cierres y auditoría.
+
+La complejidad debe quedar detrás del sistema.
+
+Para vendedores y usuarios operativos:
+- simple;
+- rápido;
+- mobile-first;
+- con la menor cantidad posible de decisiones manuales.
+
+Para Ignacio / ADMIN:
+- control integral;
+- reportes;
+- costos;
+- rentabilidad;
+- impuestos;
+- cuentas corrientes;
+- proveedores;
+- socios;
+- cierres;
+- auditoría;
+- control de integridad.
+
+REGLA GENERAL
+
+Antes de modificar:
+- revisar la implementación actual;
+- reutilizar entidades y funciones existentes cuando sean correctas;
+- no duplicar sistemas;
+- no crear módulos paralelos;
+- no borrar información histórica;
+- no crear datos demo;
+- no modificar documentos confirmados silenciosamente;
+- crear respaldo/checkpoint antes de cambios estructurales;
+- migrar datos existentes antes de reemplazar estructuras;
+- cuando un dato histórico sea dudoso, marcar PARA REVISAR y no inventar relaciones.
+
+Si existe conflicto entre una implementación vieja y esta especificación, esta especificación define la regla de negocio.
+
+==================================================
+PARTE 1 — LÓGICA DEL SISTEMA
+==================================================
+
+1. PRINCIPIO DE AUTOMATIZACIÓN
+
+El usuario carga hechos.
+
+El sistema calcula resultados derivados.
+
+Ejemplo:
+
+VENTA
+→ REMITO
+→ MOVIMIENTO DE STOCK
+→ CUENTA CORRIENTE
+→ COSTO HISTÓRICO
+→ CMV
+→ MARGEN
+→ EFECTO FINANCIERO
+→ EFECTO CONTABLE
+→ AUDITORÍA.
+
+No pedir manualmente:
+- stock calculable;
+- saldo cliente;
+- saldo proveedor;
+- saldo socio;
+- margen;
+- markup;
+- IVA calculado;
+- utilidad;
+- ganancia de socios;
+- costos distribuidos cuando puedan calcularse.
+
+2. ROLES
+
+ADMIN PRINCIPAL:
+IGNACIO.
+
+Admin tiene acceso completo.
+
+Los vendedores solamente acceden a funciones operativas.
+
+Los permisos deben existir realmente en backend/datos, no solamente ocultando botones.
+
+Un vendedor no debe poder acceder a información restringida mediante:
+- URL directa;
+- API;
+- endpoint;
+- exportación;
+- manipulación del frontend;
+- búsqueda indirecta.
+
+3. REPORTES — SOLO ADMIN
+
+Todos los reportes administrativos, financieros, contables, impositivos y gerenciales son exclusivos de Admin.
+
+Incluye:
+- ventas globales;
+- compras;
+- costos;
+- costo puesto;
+- costo de reposición;
+- márgenes;
+- markup;
+- rentabilidad;
+- caja;
+- bancos;
+- proveedores;
+- IVA;
+- IIBB;
+- stock valorizado;
+- roturas valorizadas;
+- cuentas por cobrar;
+- cuentas por pagar;
+- punto de equilibrio;
+- resultados;
+- socios;
+- ganancias de Enzo;
+- ganancias de Ignacio;
+- cierres;
+- auditoría;
+- control de integridad.
+
+Los vendedores pueden ver solamente:
+- sus clientes;
+- ruta;
+- visitas;
+- remitos;
+- ventas;
+- cobranzas;
+- presupuestos;
+- consignaciones;
+- stock operativo del camión;
+- cargas;
+- precios autorizados;
+- cuenta corriente necesaria para cobrar.
+
+4. CLIENTE, SUCURSAL Y PAGADOR
+
+Separar definitivamente:
+
+CLIENTE PRINCIPAL
+SUCURSAL / DESTINO
+PAGADOR.
+
+Cliente principal:
+entidad comercial.
+
+Sucursal:
+lugar físico donde se entrega.
+
+Pagador:
+responsable económico de la deuda.
+
+Un cliente puede tener varias sucursales.
+
+Varias sucursales pueden compartir el mismo pagador.
+
+Una sucursal puede tener cuenta propia cuando comercialmente corresponda.
+
+5. CLIENTE PRINCIPAL
+
+Nunca permitir cargar el cliente principal como texto libre en:
+- ventas;
+- remitos;
+- presupuestos;
+- consignaciones;
+- cobranzas;
+- visitas.
+
+Siempre seleccionar desde el maestro de clientes.
+
+Si no existe:
+mostrar + CREAR CLIENTE.
+
+Después de crearlo, volver a la operación con el cliente seleccionado.
+
+Internamente utilizar IDs.
+
+Los nombres son solamente descriptivos.
+
+6. SUCURSALES
+
+Cada sucursal puede tener:
+- nombre;
+- dirección;
+- localidad;
+- teléfono;
+- ubicación;
+- coordenadas;
+- observaciones;
+- estado activo/inactivo.
+
+Una sucursal debe pertenecer al cliente seleccionado.
+
+Si cambia el cliente, limpiar automáticamente la sucursal anterior.
+
+No crear clientes duplicados para representar sucursales.
+
+7. PAGADORES
+
+Por defecto:
+pagador = cliente principal.
+
+Permitir:
+- varias sucursales con un mismo pagador;
+- sucursales con cuenta independiente.
+
+La cuenta corriente pertenece al pagador.
+
+La sucursal identifica el destino de entrega.
+
+8. MISMO PAGADOR — VARIAS SUCURSALES
+
+Debe poder consultarse:
+
+SALDO GENERAL DEL PAGADOR
+
+y
+
+DETALLE POR SUCURSAL.
+
+No duplicar deuda.
+
+9. DOS PAGADORES
+
+Si una operación tiene dos pagadores diferentes:
+generar dos ventas/documentos económicos independientes.
+
+Cada uno con:
+- cliente;
+- sucursal;
+- pagador;
+- productos;
+- cantidades;
+- precios;
+- total;
+- deuda;
+- remito.
+
+El botón + SEGUNDO PAGADOR debe abrir un selector del maestro.
+
+Nunca texto libre.
+
+10. OPERACIÓN COMERCIAL, VENTA Y REMITO
+
+Mantener separados:
+
+OPERACIÓN COMERCIAL
+VENTA
+REMITO.
+
+Operación Comercial:
+agrupación logística.
+
+Venta:
+hecho económico.
+
+Remito:
+documento de entrega.
+
+Esto permite soportar correctamente:
+- varios destinos;
+- varios pagadores;
+- varias entregas;
+- facturación posterior.
+
+11. SIN CARGO
+
+Cuando una operación sea SIN CARGO:
+
+NO pedir lista de precios.
+
+Precio cliente:
+$0.
+
+Total:
+$0.
+
+NO generar deuda.
+
+SÍ:
+- descontar stock;
+- registrar costo;
+- generar movimiento de stock;
+- identificar cliente;
+- identificar sucursal;
+- registrar usuario/vendedor;
+- generar remito;
+- registrar motivo;
+- registrar auditoría.
+
+Motivos:
+- bonificación;
+- muestra;
+- reposición;
+- promoción;
+- publicidad;
+- cortesía;
+- otro.
+
+Si es Otro:
+observación obligatoria.
+
+12. STOCK — FUENTE DE VERDAD
+
+El stock nunca debe ser editable.
+
+Stock =
+suma de movimientos.
+
+Ubicaciones mínimas:
+- Depósito;
+- Camión;
+- Consignación.
+
+Debe poder ampliarse a nuevos depósitos o vehículos.
+
+13. UNIDAD BASE DE STOCK
+
+Cada producto debe tener una unidad mínima real.
+
+Ejemplo:
+500 cc:
+unidad base = botella.
+
+Pack de 12:
+12 unidades.
+
+Pallet de 150 packs:
+1.800 unidades.
+
+La interfaz puede trabajar con:
+- pallets;
+- packs;
+- unidades.
+
+Internamente convertir todo a unidad base.
+
+No utilizar fracciones artificiales de pack como fuente de verdad.
+
+14. CAMIÓN COMPARTIDO
+
+Existe un único stock físico del camión.
+
+Si dos vendedores trabajan sobre el mismo camión:
+ambos consumen el mismo stock.
+
+No crear stock por vendedor.
+
+Cada operación sí conserva quién la realizó.
+
+15. TRES LISTAS FIJAS
+
+Deben existir exactamente:
+
+CAMIÓN
+PALLET
+PACK.
+
+Son listas comerciales.
+
+No confundir lista de precios con unidad física de venta.
+
+Admin configura sus reglas.
+
+No crear listas nuevas desde la operatoria normal.
+
+16. LISTA ASIGNADA
+
+Cada cliente/pagador tiene una lista autorizada.
+
+El vendedor no debe elegir libremente otra lista.
+
+Admin puede cambiarla.
+
+Todo cambio debe guardar:
+- lista anterior;
+- lista nueva;
+- fecha de vigencia;
+- usuario;
+- motivo.
+
+17. PRECIOS REALES
+
+Utilizar como base la última lista real suministrada y verificada.
+
+No inventar precios.
+
+Si falta un dato:
+marcar PENDIENTE DE CONFIRMACIÓN.
+
+Nunca presentar un precio histórico o provisorio como vigente.
+
+18. MODELO DE COSTOS
+
+Separar cuatro conceptos:
+
+A. COSTO DE COMPRA NETO
+Precio neto del proveedor.
+
+B. COSTO CONTABLE DEL INVENTARIO
+Costo utilizado para inventario y CMV.
+
+Incluye costos reales directamente atribuibles a poner la mercadería disponible.
+
+C. COSTO DE REPOSICIÓN
+Costo actual/proyectado para volver a comprar la mercadería.
+
+Se utiliza para definir precios futuros.
+
+D. COSTO COMERCIAL
+Costos de vender/distribuir:
+- comisión;
+- IIBB;
+- costos financieros;
+- medios de pago;
+- reparto;
+- otros.
+
+No mezclar estos conceptos.
+
+19. FLETE
+
+Separar:
+
+FLETE DE ABASTECIMIENTO
+y
+FLETE DE REPARTO.
+
+Flete de abastecimiento:
+proveedor → depósito.
+
+Puede formar parte del costo contable cuando corresponda.
+
+Flete de reparto:
+depósito/camión → cliente.
+
+Es gasto comercial/logístico.
+
+Separar además:
+
+FLETE PREVISTO
+y
+FLETE REAL.
+
+Flete previsto:
+forma precios futuros.
+
+Flete real:
+determina resultado real.
+
+Nunca contabilizar dos veces el mismo flete.
+
+20. DISTRIBUCIÓN DEL FLETE
+
+Permitir distribuir por:
+- pallet;
+- pack;
+- unidad;
+- valor;
+- criterio manual excepcional.
+
+Guardar el criterio utilizado.
+
+Calcular:
+- flete por unidad;
+- flete por pack;
+- flete por pallet.
+
+21. ROTURA PREVISTA
+
+Valor inicial:
+3%.
+
+Debe ser variable y administrable.
+
+NO hardcodear.
+
+La rotura prevista:
+- protege el precio futuro;
+- forma parte del cálculo comercial;
+- NO descuenta stock;
+- NO representa mercadería rota;
+- NO debe contabilizarse como pérdida real.
+
+El porcentaje aplicado históricamente queda congelado para ese período/carga/lista.
+
+22. ROTURA REAL
+
+La rotura real existe cuando efectivamente se rompe mercadería.
+
+Crear:
+REGISTRAR ROTURA.
+
+Permitir cargar:
+- producto;
+- packs;
+- unidades sueltas;
+- ubicación;
+- fecha;
+- motivo;
+- usuario;
+- carga relacionada;
+- observación;
+- evidencia opcional.
+
+Ejemplo:
+1 pack de 12 + 3 botellas = 15 unidades rotas.
+
+La conversión debe ser automática.
+
+23. EFECTO DE ROTURA REAL
+
+La rotura real:
+- descuenta stock;
+- genera movimiento ROTURA;
+- se valoriza al costo histórico aplicable;
+- genera pérdida real;
+- queda auditada.
+
+NO genera:
+- venta;
+- IVA venta;
+- cuenta corriente;
+- comisión.
+
+24. ROTURA PREVISTA VS REAL
+
+Comparar:
+
+ROTURA CONTEMPLADA EN PRECIO
+vs
+ROTURA REAL.
+
+Si se rompe menos:
+la rentabilidad real será mayor.
+
+Si se rompe más:
+la rentabilidad real será menor.
+
+No crear una segunda ganancia/pérdida artificial si la diferencia ya está reflejada en el resultado.
+
+Evitar doble contabilización.
+
+25. TASA FUTURA DE ROTURA
+
+Calcular automáticamente:
+- tasa real por producto;
+- tasa real por familia;
+- tasa real por carga;
+- tasa real por período;
+- promedio móvil ponderado;
+- tasa sugerida futura.
+
+Prioridad:
+PRODUCTO
+>
+FAMILIA
+>
+GENERAL.
+
+La tasa nueva se aplica únicamente a futuro.
+
+26. ACTUALIZACIÓN DEL 3%
+
+Configurar:
+
+modo_actualizacion_rotura:
+- automática;
+- sugerida con aprobación Admin.
+
+También:
+- mínimo de unidades;
+- mínimo de cargas/períodos;
+- máximo cambio permitido por actualización.
+
+Regla inicial recomendada:
+el sistema calcula la tasa sugerida.
+
+Si el cambio es normal:
+puede aplicarse a la próxima carga según configuración.
+
+Si es extraordinario:
+requiere aprobación de Admin.
+
+Nunca recalcular historia.
+
+27. IVA
+
+Separar siempre:
+
+NETO
+IVA
+TOTAL.
+
+IVA compra:
+crédito fiscal.
+
+IVA venta:
+débito fiscal.
+
+El IVA recuperable:
+- no es ganancia;
+- no debe inflar artificialmente el costo económico.
+
+Permitir excepciones configurables.
+
+28. IIBB
+
+IIBB debe ser variable.
+
+No forma parte automáticamente del costo de inventario.
+
+Sí debe participar en:
+- formación comercial;
+- resultado;
+- provisiones/reportes.
+
+29. MARKUP Y MARGEN
+
+MARKUP:
+(Precio - Costo) / Costo.
+
+MARGEN:
+(Precio - Costo) / Precio.
+
+Mostrar ambos.
+
+Nunca tratarlos como iguales.
+
+30. MOTOR DE PRECIOS
+
+No sumar porcentajes de forma simplificada.
+
+Cada componente debe indicar su base:
+
+- % sobre costo;
+- % sobre venta neta;
+- % sobre venta final;
+- importe por unidad;
+- importe por pack;
+- importe por pallet;
+- impuesto;
+- comisión;
+- costo financiero;
+- redondeo.
+
+El motor debe resolver matemáticamente el precio necesario para cumplir el margen/markup configurado.
+
+31. REGLA POR LISTA
+
+CAMIÓN, PALLET y PACK pueden usar:
+
+- margen objetivo;
+o
+- markup objetivo;
+o
+- precio excepcional autorizado.
+
+Una excepción manual requiere:
+- Admin;
+- motivo;
+- vigencia;
+- auditoría.
+
+32. LISTA PACK — REDONDEO HACIA ARRIBA
+
+La Lista PACK debe redondearse siempre hacia arriba.
+
+Paso configurable:
+- $10;
+- $50;
+- $100;
+- $500;
+- $1.000;
+- personalizado.
+
+Fórmula:
+precio final = próximo múltiplo superior del paso configurado.
+
+Guardar:
+- precio matemático;
+- precio publicado;
+- diferencia;
+- margen real final.
+
+33. VERSIONADO DE PRECIOS
+
+Nunca sobrescribir precios históricos.
+
+Cada cambio genera una nueva versión.
+
+Guardar:
+- lista;
+- producto;
+- vigencia;
+- costo utilizado;
+- variables utilizadas;
+- precio;
+- margen;
+- usuario;
+- motivo.
+
+Las ventas históricas conservan el precio original.
+
+34. COMPRAS
+
+Una compra confirmada debe generar automáticamente:
+- entrada de stock;
+- costo;
+- lote/capa de costo;
+- IVA compra;
+- deuda proveedor;
+- vencimiento;
+- historial;
+- asiento;
+- auditoría.
+
+El pago posterior:
+- reduce proveedor;
+- reduce caja/banco.
+
+NO vuelve a ingresar stock.
+
+35. CMV
+
+Método inicial:
+PROMEDIO PONDERADO MÓVIL.
+
+Cada venta guarda un snapshot del costo utilizado.
+
+Un aumento futuro del proveedor no modifica la utilidad histórica.
+
+36. CUENTA CORRIENTE CLIENTE
+
+Saldo derivado.
+
+Nunca editable.
+
+Movimientos:
+- venta;
+- cobranza;
+- anticipo;
+- nota de débito;
+- nota de crédito;
+- ajuste autorizado;
+- reversión.
+
+La cuenta pertenece al pagador.
+
+37. COBRANZAS
+
+Registrar:
+- pagador;
+- fecha/hora;
+- importe;
+- usuario/vendedor;
+- medio;
+- documentos imputados;
+- observaciones.
+
+Puede aplicarse:
+- a un remito/venta;
+- a varios;
+- como anticipo.
+
+Cobrar NO modifica stock.
+
+38. PROVEEDORES
+
+Saldo proveedor derivado de movimientos.
+
+Movimientos:
+- compra;
+- nota débito;
+- nota crédito;
+- pago;
+- ajuste;
+- reversión.
+
+Nunca saldo editable.
+
+39. CAJA Y BANCOS
+
+Separar resultado económico de movimiento de dinero.
+
+Una venta a crédito:
+genera venta y cuenta a cobrar.
+
+NO genera efectivo hasta cobrarse.
+
+40. CONTABILIDAD DE GESTIÓN
+
+Implementar partida doble interna.
+
+Ejemplos:
+
+COMPRA:
+Inventario + IVA Crédito
+contra
+Proveedor.
+
+VENTA:
+Cliente/Caja
+contra
+Ventas + IVA Débito.
+
+CMV:
+Costo de Mercadería Vendida
+contra
+Inventario.
+
+COBRANZA:
+Caja/Banco
+contra
+Cliente.
+
+ROTURA:
+Pérdida por Rotura
+contra
+Inventario.
+
+Todo asiento debe balancear.
+
+41. CONTABILIDAD DE GESTIÓN Y FISCAL
+
+Separar:
+
+CONTABILIDAD DE GESTIÓN
+y
+CONTABILIDAD FISCAL/LEGAL.
+
+El sistema debe poder ser preciso internamente sin asumir que sustituye el criterio del contador.
+
+Permitir parametrizar:
+- cuentas;
+- impuestos;
+- tratamientos.
+
+42. PLAN DE CUENTAS
+
+Plan configurable.
+
+Mínimo:
+
+ACTIVO:
+- Caja;
+- Bancos;
+- Clientes;
+- Inventario;
+- IVA Crédito.
+
+PASIVO:
+- Proveedores;
+- IVA a pagar;
+- IIBB a pagar.
+
+PATRIMONIO:
+- Capital;
+- Resultados acumulados;
+- Cuentas socios.
+
+INGRESOS:
+- Ventas.
+
+COSTOS:
+- CMV.
+
+GASTOS:
+- Roturas;
+- Flete de reparto;
+- Comisiones;
+- Bancarios;
+- Financieros;
+- Operativos.
+
+43. RESULTADO
+
+Mostrar:
+
+Ventas netas
+- CMV
+=
+Margen bruto
+
+- costos comerciales variables
+=
+Margen de contribución
+
+- gastos operativos
+=
+Resultado operativo
+
++/- otros resultados
+- impuestos no recuperables
+=
+RESULTADO NETO.
+
+Nunca restar dos veces conceptos ya incluidos en CMV.
+
+44. RESULTADO NETO VS CAJA
+
+Mostrar separadamente:
+
+RESULTADO NETO
+
+y
+
+CAJA LIBRE / DISPONIBLE.
+
+Una empresa puede ser rentable y no tener todavía el dinero cobrado.
+
+45. SOCIOS
+
+Configurar inicialmente:
+
+ENZO = 50%.
+IGNACIO = 50%.
+
+La suma debe ser 100%.
+
+Todo cambio futuro:
+- solo Admin;
+- vigencia;
+- motivo;
+- auditoría.
+
+46. GANANCIA DE SOCIOS
+
+Calcular:
+
+RESULTADO ATRIBUIBLE ENZO = 50%.
+RESULTADO ATRIBUIBLE IGNACIO = 50%.
+
+Pero no generar retiros automáticos.
+
+Separar:
+- ganancia generada;
+- ganancia asignada;
+- resultado retenido;
+- retiro efectivo.
+
+47. CUENTA DE SOCIOS
+
+Libro de movimientos por socio:
+
+- aporte;
+- asignación de resultado;
+- retiro;
+- reintegro;
+- gasto personal imputable;
+- ajuste.
+
+Nunca editar saldo directamente.
+
+48. PÉRDIDAS
+
+Si un período da pérdida:
+no generar retiro negativo.
+
+Registrar pérdida.
+
+Afectar resultados acumulados.
+
+La distribución futura debe contemplarla correctamente.
+
+49. CIERRES
+
+Crear:
+
+CIERRE DE CARGA
+CIERRE MENSUAL
+CIERRE DE EJERCICIO.
+
+Cierre de carga:
+- stock;
+- diferencias;
+- roturas;
+- flete;
+- sugerencia de parámetros futuros.
+
+Cierre mensual:
+- ventas;
+- compras;
+- cobranzas;
+- CMV;
+- gastos;
+- IVA;
+- IIBB;
+- caja;
+- cuentas;
+- resultado.
+
+Cierre de ejercicio:
