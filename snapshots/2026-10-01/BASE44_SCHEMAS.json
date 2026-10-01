@@ -1,0 +1,2916 @@
+{
+  "captured_at": "2026-10-01",
+  "source": {
+    "platform": "Base44",
+    "app_name": "Palau",
+    "app_id": "6ab44f946746388d9ad48b68"
+  },
+  "schemas": [
+    {
+      "entity_name": "Presupuesto",
+      "entity_schema": {
+        "name": "Presupuesto",
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "string"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cliente": {
+            "type": "string"
+          },
+          "vendedor": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "borrador",
+              "enviado",
+              "aceptado",
+              "vencido",
+              "convertido"
+            ],
+            "default": "borrador"
+          },
+          "total": {
+            "type": "number"
+          },
+          "vigencia_hasta": {
+            "type": "string",
+            "format": "date"
+          },
+          "remito_generado": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "numero",
+          "fecha",
+          "cliente",
+          "vendedor"
+        ],
+        "rls": {
+          "read": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "CONSULTA"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "SOCIO"
+                }
+              },
+              {
+                "created_by_id": "{{user.id}}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "RemitoItem",
+      "entity_schema": {
+        "name": "RemitoItem",
+        "type": "object",
+        "properties": {
+          "remito_id": {
+            "type": "string"
+          },
+          "articulo": {
+            "type": "string"
+          },
+          "cantidad": {
+            "type": "number"
+          },
+          "precio_unitario": {
+            "type": "number"
+          },
+          "costo_unitario": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          },
+          "margen": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "remito_id",
+          "articulo",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "CajaMovimiento",
+      "entity_schema": {
+        "name": "CajaMovimiento",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "ingreso",
+              "egreso"
+            ]
+          },
+          "concepto": {
+            "type": "string"
+          },
+          "monto": {
+            "type": "number"
+          },
+          "medio_pago": {
+            "type": "string"
+          },
+          "usuario": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "tipo",
+          "concepto",
+          "monto"
+        ]
+      }
+    },
+    {
+      "entity_name": "Articulo",
+      "entity_schema": {
+        "name": "Articulo",
+        "properties": {
+          "activo": {
+            "default": true,
+            "type": "boolean"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "costo": {
+            "description": "LEGADO: no usar",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": "number"
+          },
+          "costo_neto": {
+            "description": "LEGADO",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": "number"
+          },
+          "costo_real": {
+            "description": "LEGADO",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": "number"
+          },
+          "costo_reposicion_centavos": {
+            "description": "Costo actual para formar precios futuros (no reescribe CMV)",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "familia": {
+            "type": "string"
+          },
+          "imagen_url": {
+            "type": "string"
+          },
+          "impuestos_costo": {
+            "description": "LEGADO",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": "number"
+          },
+          "iva_alicuota": {
+            "description": "Porcentaje de IVA incluido en el precio final (ej. 21). Vacío = pendiente de confirmar",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "marca": {
+            "type": "string"
+          },
+          "margen_objetivo": {
+            "description": "LEGADO",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            },
+            "type": "number"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "origen": {
+            "default": "PALAU",
+            "description": "Solo PALAU se usa en la operatoria. Los otros quedan inactivos y no se mezclan.",
+            "enum": [
+              "PALAU",
+              "AJENO_YO",
+              "DEMO_PLANTILLA"
+            ],
+            "type": "string"
+          },
+          "packs_por_pallet": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "precio": {
+            "description": "LEGADO: no usar",
+            "type": "number"
+          },
+          "precio_provisorio": {
+            "default": true,
+            "type": "boolean"
+          },
+          "precio_sugerido": {
+            "description": "LEGADO",
+            "type": "number"
+          },
+          "presentacion": {
+            "description": "Ej: 500 cc, 1,5 L, 6 L",
+            "type": "string"
+          },
+          "proveedor_principal": {
+            "description": "LEGADO",
+            "type": "string"
+          },
+          "rubro": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "stock": {
+            "description": "LEGADO: el stock se calcula desde movimientos",
+            "type": "number"
+          },
+          "stock_camion": {
+            "description": "LEGADO",
+            "type": "number"
+          },
+          "stock_consignacion": {
+            "description": "LEGADO",
+            "type": "number"
+          },
+          "stock_deposito": {
+            "description": "LEGADO",
+            "type": "number"
+          },
+          "stock_minimo": {
+            "description": "LEGADO",
+            "type": "number"
+          },
+          "stock_minimo_unidades": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "unidad_base": {
+            "default": "unidad",
+            "description": "Unidad mínima real de stock (botella/unidad)",
+            "type": "string"
+          },
+          "unidad_venta": {
+            "description": "LEGADO",
+            "type": "string"
+          },
+          "unidades_por_bulto": {
+            "description": "LEGADO",
+            "type": "number"
+          },
+          "unidades_por_pack": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "nombre"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "PresupuestoItem",
+      "entity_schema": {
+        "name": "PresupuestoItem",
+        "type": "object",
+        "properties": {
+          "presupuesto_id": {
+            "type": "string"
+          },
+          "articulo": {
+            "type": "string"
+          },
+          "cantidad": {
+            "type": "number"
+          },
+          "precio_unitario": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "presupuesto_id",
+          "articulo",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "CuentaCorriente",
+      "entity_schema": {
+        "name": "CuentaCorriente",
+        "type": "object",
+        "properties": {
+          "debe_centavos": {
+            "default": 0,
+            "type": "integer"
+          },
+          "detalle_auditoria": {
+            "description": "Solo en 'Ver detalle / auditoría' y exportación completa",
+            "type": "string"
+          },
+          "estado": {
+            "default": "PARA_REVISAR",
+            "enum": [
+              "CONFIRMADO",
+              "PARA_REVISAR"
+            ],
+            "type": "string"
+          },
+          "evidencia": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "haber_centavos": {
+            "default": 0,
+            "type": "integer"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "nota_corta": {
+            "description": "Se muestra en la vista simple",
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "sucursal_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipo": {
+            "enum": [
+              "SALDO_INICIAL",
+              "REGULARIZACION_HISTORICA",
+              "NOTA_DEBITO",
+              "NOTA_CREDITO",
+              "AJUSTE",
+              "VENTA",
+              "COBRANZA",
+              "REVERSA_VENTA",
+              "REVERSA_COBRANZA"
+            ],
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pagador_id",
+          "fecha",
+          "tipo",
+          "idempotency_key",
+          "estado"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "CONSULTA"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "SOCIO"
+                }
+              },
+              {
+                "data.usuario_id": "{{user.id}}"
+              }
+            ]
+          },
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "Categoria",
+      "entity_schema": {
+        "name": "Categoria",
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "descripcion": {
+            "type": "string",
+            "title": "Descripción"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color",
+            "default": "#64748b"
+          }
+        },
+        "required": [
+          "nombre"
+        ]
+      }
+    },
+    {
+      "entity_name": "Socio",
+      "entity_schema": {
+        "name": "Socio",
+        "properties": {
+          "activo": {
+            "default": true,
+            "type": "boolean"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "porcentaje": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vigencia_desde": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "porcentaje"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Consignacion",
+      "entity_schema": {
+        "name": "Consignacion",
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "string"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "vendedor": {
+            "type": "string"
+          },
+          "cliente": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "abierta",
+              "vendida",
+              "devuelta"
+            ],
+            "default": "abierta"
+          },
+          "total_unidades": {
+            "type": "number"
+          },
+          "remito_venta": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "numero",
+          "fecha",
+          "vendedor"
+        ]
+      }
+    },
+    {
+      "entity_name": "ActivoComodato",
+      "entity_schema": {
+        "name": "ActivoComodato",
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string"
+          },
+          "codigo": {
+            "type": "string"
+          },
+          "cliente": {
+            "type": "string"
+          },
+          "fecha_entrega": {
+            "type": "string",
+            "format": "date"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "entregado",
+              "reparacion",
+              "devuelto",
+              "baja"
+            ]
+          },
+          "marca": {
+            "type": "string"
+          },
+          "modelo": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo",
+          "codigo"
+        ]
+      }
+    },
+    {
+      "entity_name": "Proveedor",
+      "entity_schema": {
+        "name": "Proveedor",
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "title": "Nombre"
+          },
+          "contacto": {
+            "type": "string",
+            "title": "Contacto"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "format": "email"
+          },
+          "telefono": {
+            "type": "string",
+            "title": "Teléfono"
+          },
+          "direccion": {
+            "type": "string",
+            "title": "Dirección"
+          },
+          "notas": {
+            "type": "string",
+            "title": "Notas"
+          },
+          "activo": {
+            "type": "boolean",
+            "title": "Activo",
+            "default": true
+          }
+        },
+        "required": [
+          "nombre"
+        ]
+      }
+    },
+    {
+      "entity_name": "PuntoVenta",
+      "entity_schema": {
+        "name": "PuntoVenta",
+        "properties": {
+          "codigo": {
+            "description": "Serie de numeración, ej. 0001",
+            "type": "string"
+          },
+          "estado": {
+            "default": "ACTIVO",
+            "enum": [
+              "ACTIVO",
+              "ARCHIVADO"
+            ],
+            "type": "string"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "observaciones": {
+            "type": "string"
+          },
+          "responsable_user_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ubicacion_stock_id": {
+            "description": "Ubicación de la que descuenta (ej. Camión)",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "codigo",
+          "nombre"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "DocumentoFuente",
+      "entity_schema": {
+        "name": "DocumentoFuente",
+        "type": "object",
+        "properties": {
+          "fecha_documento": {
+            "type": "string",
+            "format": "date"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "factura_compra",
+              "factura_venta",
+              "remito",
+              "comprobante_pago",
+              "transferencia",
+              "cheque",
+              "echeq",
+              "whatsapp",
+              "planilla",
+              "banco",
+              "conteo_stock",
+              "confirmacion_usuario",
+              "otro"
+            ]
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "archivo_url": {
+            "type": "string"
+          },
+          "emisor": {
+            "type": "string"
+          },
+          "receptor": {
+            "type": "string"
+          },
+          "importe": {
+            "type": "number"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "CONFIRMADO",
+              "INCONCLUSO",
+              "DUPLICADO",
+              "DESCARTADO"
+            ],
+            "default": "INCONCLUSO"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tipo",
+          "referencia"
+        ]
+      }
+    },
+    {
+      "entity_name": "Visita",
+      "entity_schema": {
+        "name": "Visita",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cliente": {
+            "type": "string"
+          },
+          "vendedor": {
+            "type": "string"
+          },
+          "estado_visible": {
+            "type": "string",
+            "enum": [
+              "visitado",
+              "venta",
+              "sin_venta",
+              "cerrado",
+              "no_atendio"
+            ]
+          },
+          "ubicacion_verificada": {
+            "type": "boolean"
+          },
+          "distancia_metros": {
+            "type": "number"
+          },
+          "latitud": {
+            "type": "number"
+          },
+          "longitud": {
+            "type": "number"
+          },
+          "resultado": {
+            "type": "string"
+          },
+          "documento_asociado": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "cliente",
+          "vendedor"
+        ]
+      }
+    },
+    {
+      "entity_name": "Cliente",
+      "entity_schema": {
+        "name": "Cliente",
+        "properties": {
+          "alias": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "condicion_pago": {
+            "default": "CUENTA_CORRIENTE",
+            "enum": [
+              "CONTADO",
+              "CUENTA_CORRIENTE"
+            ],
+            "type": "string"
+          },
+          "creado_por_user_id": {
+            "type": "string"
+          },
+          "cuit": {
+            "type": "string"
+          },
+          "dias_plazo": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "direccion": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "ACTIVO",
+            "enum": [
+              "ACTIVO",
+              "ARCHIVADO",
+              "FUSIONADO"
+            ],
+            "type": "string"
+          },
+          "fusionado_en_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latitud": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "limite_credito_centavos": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "lista_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "localidad": {
+            "type": "string"
+          },
+          "longitud": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "nombre_comercial": {
+            "type": "string"
+          },
+          "nombres_anteriores": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "observaciones": {
+            "type": "string"
+          },
+          "para_revisar": {
+            "default": false,
+            "type": "boolean"
+          },
+          "punto_venta_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "razon_social": {
+            "type": "string"
+          },
+          "telefono": {
+            "type": "string"
+          },
+          "zona": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre_comercial"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.creado_por_user_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "CargaCamion",
+      "entity_schema": {
+        "description": "LEGADO sin uso: las cargas se registran como MovimientoStock CARGA_CAMION",
+        "name": "CargaCamion",
+        "properties": {
+          "estado": {
+            "default": "borrador",
+            "enum": [
+              "borrador",
+              "declarada",
+              "confirmada",
+              "cerrada"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date",
+            "type": "string"
+          },
+          "numero_remito_interno": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "punto_venta_id": {
+            "description": "Reemplaza la asignación fija a personas",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total_unidades": {
+            "default": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "fecha",
+          "numero_remito_interno"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Deposito",
+      "entity_schema": {
+        "name": "Deposito",
+        "properties": {
+          "activo": {
+            "default": true,
+            "type": "boolean"
+          },
+          "cliente_id": {
+            "description": "Para consignación: cliente donde está la mercadería",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "tipo": {
+            "enum": [
+              "deposito",
+              "camion",
+              "consignacion",
+              "otro"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "tipo"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "user_condition": {
+                  "palau_rol": "VENDEDOR"
+                }
+              }
+            ]
+          },
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Auditoria",
+      "entity_schema": {
+        "name": "Auditoria",
+        "properties": {
+          "accion": {
+            "type": "string"
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "entidad": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "registro_id": {
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          },
+          "valor_anterior": {
+            "type": "string"
+          },
+          "valor_nuevo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "accion",
+          "entidad"
+        ],
+        "rls": {
+          "create": {},
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "MovimientoSocio",
+      "entity_schema": {
+        "name": "MovimientoSocio",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "socio": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "aporte_capital",
+              "aporte_mercaderia",
+              "gasto_pagado",
+              "cobro_retenido",
+              "retiro_personal",
+              "reintegro",
+              "ajuste"
+            ]
+          },
+          "importe": {
+            "type": "number"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "estado_evidencia": {
+            "type": "string",
+            "enum": [
+              "CONFIRMADO",
+              "INCONCLUSO",
+              "DUPLICADO",
+              "DESCARTADO"
+            ],
+            "default": "INCONCLUSO"
+          }
+        },
+        "required": [
+          "fecha",
+          "socio",
+          "tipo",
+          "importe"
+        ]
+      }
+    },
+    {
+      "entity_name": "Remito",
+      "entity_schema": {
+        "name": "Remito",
+        "properties": {
+          "cliente_id": {
+            "type": "string"
+          },
+          "cliente_nombre": {
+            "type": "string"
+          },
+          "direccion_entrega": {
+            "type": "string"
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "articulo_id": {
+                  "type": "string"
+                },
+                "cantidad_ingresada": {
+                  "type": "integer"
+                },
+                "cantidad_unidades": {
+                  "type": "integer"
+                },
+                "descripcion": {
+                  "type": "string"
+                },
+                "importe_centavos": {
+                  "type": "integer"
+                },
+                "iva_alicuota": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "precio_pack_centavos": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "precio_unitario_centavos": {
+                  "type": "integer"
+                },
+                "precio_version_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "unidad_ingreso": {
+                  "enum": [
+                    "unidad",
+                    "pack",
+                    "pallet"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "lista_codigo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lista_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "motivo_sin_cargo": {
+            "enum": [
+              "bonificacion",
+              "muestra",
+              "reposicion",
+              "promocion",
+              "publicidad",
+              "cortesia",
+              "otro",
+              null
+            ],
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "numero": {
+            "type": "string"
+          },
+          "numero_original": {
+            "description": "Número del papel/sistema anterior",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "operacion_id": {
+            "description": "Agrupa ventas de una misma operación (ej. dos pagadores)",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "origen": {
+            "default": "APP",
+            "enum": [
+              "APP",
+              "HISTORICO"
+            ],
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "pagador_nombre": {
+            "type": "string"
+          },
+          "punto_venta_id": {
+            "type": "string"
+          },
+          "sin_cargo": {
+            "default": false,
+            "type": "boolean"
+          },
+          "sucursal_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sucursal_nombre": {
+            "type": "string"
+          },
+          "total_centavos": {
+            "type": "integer"
+          },
+          "ubicacion_origen_id": {
+            "type": "string"
+          },
+          "vendedor_nombre": {
+            "type": "string"
+          },
+          "vendedor_user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "punto_venta_id",
+          "fecha",
+          "cliente_id",
+          "pagador_id",
+          "ubicacion_origen_id",
+          "items",
+          "total_centavos",
+          "idempotency_key"
+        ],
+        "type": "object",
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "$and": [
+                  {
+                    "user_condition": {
+                      "data.palau_rol": "VENDEDOR"
+                    }
+                  },
+                  {
+                    "data.vendedor_user_id": "{{user.id}}"
+                  }
+                ]
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "CONSULTA"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "SOCIO"
+                }
+              },
+              {
+                "data.vendedor_user_id": "{{user.id}}"
+              }
+            ]
+          },
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "Vehiculo",
+      "entity_schema": {
+        "name": "Vehiculo",
+        "type": "object",
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "patente": {
+            "type": "string"
+          },
+          "activo": {
+            "type": "boolean",
+            "default": true
+          },
+          "deposito_asociado": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre"
+        ]
+      }
+    },
+    {
+      "entity_name": "CuentaProveedor",
+      "entity_schema": {
+        "name": "CuentaProveedor",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "proveedor": {
+            "type": "string"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "debito",
+              "credito"
+            ]
+          },
+          "concepto": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "debe": {
+            "type": "number",
+            "default": 0
+          },
+          "haber": {
+            "type": "number",
+            "default": 0
+          },
+          "saldo": {
+            "type": "number"
+          },
+          "vencimiento": {
+            "type": "string",
+            "format": "date"
+          },
+          "usuario": {
+            "type": "string"
+          },
+          "estado_evidencia": {
+            "type": "string",
+            "enum": [
+              "CONFIRMADO",
+              "INCONCLUSO",
+              "DUPLICADO",
+              "DESCARTADO"
+            ],
+            "default": "CONFIRMADO"
+          }
+        },
+        "required": [
+          "fecha",
+          "proveedor",
+          "tipo",
+          "concepto"
+        ]
+      }
+    },
+    {
+      "entity_name": "PagoProveedor",
+      "entity_schema": {
+        "name": "PagoProveedor",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "proveedor": {
+            "type": "string"
+          },
+          "monto": {
+            "type": "number"
+          },
+          "medio_pago": {
+            "type": "string"
+          },
+          "documento_imputado": {
+            "type": "string"
+          },
+          "usuario": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "estado_evidencia": {
+            "type": "string",
+            "enum": [
+              "CONFIRMADO",
+              "INCONCLUSO",
+              "DUPLICADO",
+              "DESCARTADO"
+            ],
+            "default": "CONFIRMADO"
+          }
+        },
+        "required": [
+          "fecha",
+          "proveedor",
+          "monto"
+        ]
+      }
+    },
+    {
+      "entity_name": "Conciliacion",
+      "entity_schema": {
+        "name": "Conciliacion",
+        "type": "object",
+        "properties": {
+          "fecha_corte": {
+            "type": "string",
+            "format": "date"
+          },
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "stock",
+              "cliente",
+              "proveedor",
+              "caja",
+              "banco",
+              "socio",
+              "general"
+            ]
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "saldo_teorico": {
+            "type": "number"
+          },
+          "saldo_real": {
+            "type": "number"
+          },
+          "diferencia": {
+            "type": "number"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "abierta",
+              "parcial",
+              "cerrada"
+            ],
+            "default": "abierta"
+          },
+          "detalle": {
+            "type": "string"
+          },
+          "ultima_revision": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "fecha_corte",
+          "tipo"
+        ]
+      }
+    },
+    {
+      "entity_name": "Movimiento",
+      "entity_schema": {
+        "name": "Movimiento",
+        "type": "object",
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "title": "Tipo",
+            "enum": [
+              "entrada",
+              "salida",
+              "ajuste"
+            ],
+            "default": "entrada"
+          },
+          "articulo_id": {
+            "type": "string",
+            "title": "Artículo ID"
+          },
+          "articulo_nombre": {
+            "type": "string",
+            "title": "Artículo"
+          },
+          "cantidad": {
+            "type": "number",
+            "title": "Cantidad"
+          },
+          "motivo": {
+            "type": "string",
+            "title": "Motivo"
+          },
+          "proveedor": {
+            "type": "string",
+            "title": "Proveedor"
+          },
+          "orden_compra_id": {
+            "type": "string",
+            "title": "Orden de compra"
+          },
+          "stock_resultante": {
+            "type": "number",
+            "title": "Stock resultante"
+          }
+        },
+        "required": [
+          "tipo",
+          "articulo_id",
+          "articulo_nombre",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "PrecioProducto",
+      "entity_schema": {
+        "name": "PrecioProducto",
+        "properties": {
+          "articulo_id": {
+            "type": "string"
+          },
+          "costo_usado_centavos": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            }
+          },
+          "estado": {
+            "description": "Nunca se sobrescribe: cada cambio es una versión nueva",
+            "enum": [
+              "VIGENTE",
+              "PENDIENTE_CONFIRMACION"
+            ],
+            "type": "string"
+          },
+          "fuente": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "lista_id": {
+            "type": "string"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "precio_pack_centavos": {
+            "description": "Precio FINAL por pack (ya redondeado hacia arriba en la lista PACK). Se usa cuando se vende en packs.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "precio_unitario_centavos": {
+            "description": "Precio FINAL por unidad base suelta, en centavos",
+            "type": "integer"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "variables_json": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            }
+          },
+          "vigencia_desde": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lista_id",
+          "articulo_id",
+          "precio_unitario_centavos",
+          "vigencia_desde",
+          "estado",
+          "idempotency_key"
+        ],
+        "type": "object",
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "Anulacion",
+      "entity_schema": {
+        "name": "Anulacion",
+        "properties": {
+          "documento_id": {
+            "type": "string"
+          },
+          "documento_tipo": {
+            "enum": [
+              "Remito",
+              "Cobranza",
+              "MovimientoStock",
+              "CuentaCorriente"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "documento_tipo",
+          "documento_id",
+          "fecha",
+          "motivo",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "ReglaMargen",
+      "entity_schema": {
+        "name": "ReglaMargen",
+        "type": "object",
+        "properties": {
+          "nivel": {
+            "type": "string",
+            "enum": [
+              "general",
+              "familia",
+              "cliente",
+              "producto"
+            ]
+          },
+          "referencia": {
+            "type": "string"
+          },
+          "margen_porcentaje": {
+            "type": "number"
+          },
+          "activo": {
+            "type": "boolean",
+            "default": true
+          },
+          "prioridad": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nivel",
+          "margen_porcentaje"
+        ]
+      }
+    },
+    {
+      "entity_name": "ConsignacionItem",
+      "entity_schema": {
+        "name": "ConsignacionItem",
+        "type": "object",
+        "properties": {
+          "consignacion_id": {
+            "type": "string"
+          },
+          "articulo": {
+            "type": "string"
+          },
+          "cantidad": {
+            "type": "number"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "abierta",
+              "vendida",
+              "devuelta"
+            ],
+            "default": "abierta"
+          }
+        },
+        "required": [
+          "consignacion_id",
+          "articulo",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "Sucursal",
+      "entity_schema": {
+        "name": "Sucursal",
+        "properties": {
+          "cliente_id": {
+            "type": "string"
+          },
+          "creado_por_user_id": {
+            "type": "string"
+          },
+          "direccion": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "ACTIVO",
+            "enum": [
+              "ACTIVO",
+              "ARCHIVADO",
+              "FUSIONADO"
+            ],
+            "type": "string"
+          },
+          "fusionado_en_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latitud": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "localidad": {
+            "type": "string"
+          },
+          "longitud": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "nombres_anteriores": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "observaciones": {
+            "type": "string"
+          },
+          "pagador_id": {
+            "description": "Cliente que paga la deuda. Vacío = el cliente principal",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "telefono": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "cliente_id",
+          "nombre"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.creado_por_user_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "OrdenCompra",
+      "entity_schema": {
+        "name": "OrdenCompra",
+        "type": "object",
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Número"
+          },
+          "proveedor_id": {
+            "type": "string",
+            "title": "Proveedor ID"
+          },
+          "proveedor_nombre": {
+            "type": "string",
+            "title": "Proveedor"
+          },
+          "estado": {
+            "type": "string",
+            "title": "Estado",
+            "enum": [
+              "borrador",
+              "enviada",
+              "recibida",
+              "cancelada"
+            ],
+            "default": "borrador"
+          },
+          "fecha": {
+            "type": "string",
+            "title": "Fecha",
+            "format": "date"
+          },
+          "items": {
+            "type": "array",
+            "title": "Items",
+            "items": {
+              "type": "object",
+              "properties": {
+                "articulo_id": {
+                  "type": "string",
+                  "title": "Artículo ID"
+                },
+                "articulo_nombre": {
+                  "type": "string",
+                  "title": "Artículo"
+                },
+                "cantidad": {
+                  "type": "number",
+                  "title": "Cantidad"
+                },
+                "precio": {
+                  "type": "number",
+                  "title": "Precio"
+                }
+              }
+            },
+            "default": []
+          },
+          "total": {
+            "type": "number",
+            "title": "Total",
+            "default": 0
+          },
+          "notas": {
+            "type": "string",
+            "title": "Notas"
+          }
+        },
+        "required": [
+          "numero",
+          "proveedor_nombre",
+          "estado"
+        ],
+        "rls": {
+          "read": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "CONSULTA"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "SOCIO"
+                }
+              },
+              {
+                "created_by_id": "{{user.id}}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "ListaPrecio",
+      "entity_schema": {
+        "name": "ListaPrecio",
+        "properties": {
+          "activa": {
+            "default": true,
+            "type": "boolean"
+          },
+          "codigo": {
+            "enum": [
+              "CAMION",
+              "PALLET",
+              "PACK"
+            ],
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "paso_redondeo_centavos": {
+            "description": "PACK: redondeo SIEMPRE hacia arriba a este múltiplo",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "redondear_arriba": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "codigo",
+          "nombre"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Cobranza",
+      "entity_schema": {
+        "name": "Cobranza",
+        "properties": {
+          "destino": {
+            "default": "CAJA_VENDEDOR",
+            "enum": [
+              "CAJA_VENDEDOR",
+              "CAJA_CENTRAL",
+              "BANCO"
+            ],
+            "type": "string"
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO"
+            ],
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "importe_centavos": {
+            "type": "integer"
+          },
+          "imputaciones": {
+            "default": [],
+            "items": {
+              "properties": {
+                "importe_centavos": {
+                  "type": "integer"
+                },
+                "remito_id": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "medio": {
+            "enum": [
+              "efectivo",
+              "transferencia",
+              "mercado_pago",
+              "cheque",
+              "echeq",
+              "otro"
+            ],
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          },
+          "origen": {
+            "default": "APP",
+            "enum": [
+              "APP",
+              "HISTORICO"
+            ],
+            "type": "string"
+          },
+          "pagador_id": {
+            "type": "string"
+          },
+          "pagador_nombre": {
+            "type": "string"
+          },
+          "recibido_por_nombre": {
+            "type": "string"
+          },
+          "recibido_por_socio_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "recibido_por_user_id": {
+            "type": "string"
+          },
+          "referencia": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pagador_id",
+          "fecha",
+          "importe_centavos",
+          "medio",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "$and": [
+                  {
+                    "user_condition": {
+                      "data.palau_rol": "VENDEDOR"
+                    }
+                  },
+                  {
+                    "data.recibido_por_user_id": "{{user.id}}"
+                  }
+                ]
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "CONSULTA"
+                }
+              },
+              {
+                "user_condition": {
+                  "data.palau_rol": "SOCIO"
+                }
+              },
+              {
+                "data.recibido_por_user_id": "{{user.id}}"
+              }
+            ]
+          },
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "entity_name": "Gasto",
+      "entity_schema": {
+        "name": "Gasto",
+        "type": "object",
+        "properties": {
+          "fecha": {
+            "type": "string",
+            "format": "date"
+          },
+          "categoria": {
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string"
+          },
+          "monto": {
+            "type": "number"
+          },
+          "medio_pago": {
+            "type": "string"
+          },
+          "proveedor": {
+            "type": "string"
+          },
+          "comprobante": {
+            "type": "string"
+          },
+          "observacion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "descripcion",
+          "monto"
+        ]
+      }
+    },
+    {
+      "entity_name": "CargaDetalle",
+      "entity_schema": {
+        "name": "CargaDetalle",
+        "type": "object",
+        "properties": {
+          "carga_id": {
+            "type": "string"
+          },
+          "articulo": {
+            "type": "string"
+          },
+          "cantidad": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "carga_id",
+          "articulo",
+          "cantidad"
+        ]
+      }
+    },
+    {
+      "entity_name": "MovimientoStock",
+      "entity_schema": {
+        "name": "MovimientoStock",
+        "type": "object",
+        "properties": {
+          "costos_centavos": {
+            "default": [],
+            "description": "Costo unitario por item (mismo orden). Solo Admin.",
+            "items": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "type": "array",
+            "rls": {
+              "create": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              "update": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            }
+          },
+          "destino_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dispositivo": {
+            "type": "string"
+          },
+          "documento": {
+            "type": "string"
+          },
+          "estado": {
+            "default": "CONFIRMADO",
+            "enum": [
+              "CONFIRMADO",
+              "PARA_REVISAR"
+            ],
+            "type": "string"
+          },
+          "evidencia": {
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "articulo_id": {
+                  "type": "string"
+                },
+                "cantidad_unidades": {
+                  "type": "integer"
+                },
+                "packs": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "sueltas": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "motivo": {
+            "type": "string"
+          },
+          "origen_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tipo": {
+            "enum": [
+              "SALDO_INICIAL",
+              "COMPRA",
+              "CARGA_CAMION",
+              "DESCARGA_CAMION",
+              "TRANSFERENCIA",
+              "ROTURA",
+              "AJUSTE_CONTEO",
+              "DEVOLUCION_CLIENTE",
+              "CONSIGNACION_SALIDA",
+              "CONSIGNACION_DEVOLUCION",
+              "REMITO_SALIDA",
+              "REMITO_REVERSION"
+            ],
+            "type": "string"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fecha",
+          "tipo",
+          "items",
+          "idempotency_key"
+        ],
+        "rls": {
+          "create": {
+            "$or": [
+              {
+                "user_condition": {
+                  "role": "admin"
+                }
+              },
+              {
+                "data.usuario_id": "{{user.id}}"
+              }
+            ]
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          },
+          "read": {},
+          "update": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "OperacionRemito",
+      "entity_schema": {
+        "name": "OperacionRemito",
+        "type": "object",
+        "properties": {
+          "idempotency_key": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "PREPARANDO",
+              "APLICANDO",
+              "CONFIRMADA",
+              "REVERSANDO",
+              "ANULADA",
+              "ERROR"
+            ]
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "usuario_id": {
+            "type": "string"
+          },
+          "usuario_nombre": {
+            "type": "string"
+          },
+          "remito_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movimiento_stock_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cc_venta_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cobranza_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cc_cobranza_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "anulacion_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movimiento_reversion_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cc_reversa_venta_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "intentos": {
+            "type": "integer",
+            "default": 0
+          },
+          "payload_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "referencia": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dispositivo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "idempotency_key",
+          "estado",
+          "fecha"
+        ],
+        "rls": {
+          "create": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "read": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "update": {
+            "user_condition": {
+              "role": "admin"
+            }
+          },
+          "delete": {
+            "user_condition": {
+              "role": "__no_one__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "entity_name": "User",
+      "entity_schema": {
+        "name": "User",
+        "properties": {
+          "estado_acceso": {
+            "default": "ACTIVO",
+            "enum": [
+              "ACTIVO",
+              "ARCHIVADO"
+            ],
+            "type": "string"
+          },
+          "palau_rol": {
+            "description": "Rol operativo en Palau",
+            "enum": [
+              "ADMIN",
+              "VENDEDOR",
+              "SOCIO",
+              "CONSULTA"
+            ],
+            "type": "string"
+          },
+          "punto_venta_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "role": {
+            "description": "The role of the user in the app",
+            "enum": [
+              "admin",
+              "user"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "role"
+        ],
+        "type": "object"
+      }
+    }
+  ]
+}
