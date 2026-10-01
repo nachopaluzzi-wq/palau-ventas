@@ -134,19 +134,16 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'La entidad % es inmutable; use reversión/compensación explícita', OLD.entity_name;
   END IF;
+  IF TG_OP = 'DELETE' THEN
+    RETURN OLD;
+  END IF;
   RETURN NEW;
 END;
-$$;
+$;
 
 DROP TRIGGER IF EXISTS trg_prevent_immutable_update ON entity_record;
 CREATE TRIGGER trg_prevent_immutable_update
 BEFORE UPDATE ON entity_record
-FOR EACH ROW
-EXECUTE FUNCTION prevent_immutable_entity_mutation();
-
-DROP TRIGGER IF EXISTS trg_prevent_immutable_delete ON entity_record;
-CREATE TRIGGER trg_prevent_immutable_delete
-BEFORE DELETE ON entity_record
 FOR EACH ROW
 EXECUTE FUNCTION prevent_immutable_entity_mutation();
 
