@@ -1,3 +1,35 @@
+ATENCIÓN — CORRECCIÓN DE DESTINO PRODUCTIVO
+
+La URL PRODUCTIVA REAL que usa Ignacio y donde deben quedar las modificaciones es:
+
+https://palau-ventas.s9k2tm28hw.chatgpt.site/
+
+NO alcanza con modificar Base44.
+NO afirmar que el trabajo está terminado si esa URL exacta no refleja el cambio.
+
+Base44 app "Palau" (ID 6ab44f946746388d9ad48b68) se usa como fuente canónica de esquema y datos actuales para entender Clientes, relaciones, cuenta corriente, stock, etc., pero EL DESTINO PRODUCTIVO A MODIFICAR ES EL CHATGPT SITE DE ARRIBA.
+
+Si el código que tenés abierto no controla esa URL exacta:
+1. detenete;
+2. identificá qué proyecto/repo/source controla ese ChatGPT Site;
+3. no hagas una implementación paralela;
+4. no publiques en otra URL;
+5. explicá exactamente qué acceso falta para modificar esa misma app.
+
+OBJETIVO INMEDIATO:
+- En la app productiva de esa URL, habilitar EDICIÓN DE CLIENTES para ADMIN.
+- Mantener el mismo Cliente.id.
+- Conservar relaciones, historial y trazabilidad.
+- Si cambia nombre_comercial, conservar el anterior en nombres_anteriores.
+- Crear Auditoria con valor anterior/nuevo, usuario y fecha.
+- Editar cliente NO puede alterar stock, saldos, cuenta corriente, remitos ni cobranzas.
+
+No rehagas la app. No migres a otra plataforma. No generes otra URL. No inventes datos.
+
+---
+
+CONTEXTO TÉCNICO ADICIONAL:
+
 Abrí y trabajá sobre este repo: https://github.com/nachopaluzzi-wq/palau-ventas
 
 LEÉ PRIMERO:
