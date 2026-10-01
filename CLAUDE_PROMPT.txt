@@ -4,6 +4,17 @@ La URL PRODUCTIVA REAL que usa Ignacio y donde deben quedar las modificaciones e
 
 https://palau-ventas.s9k2tm28hw.chatgpt.site/
 
+ORIGEN PRODUCTIVO IDENTIFICADO:
+- Plataforma: ChatGPT Sites / Work
+- Proyecto: Palau Ventas
+- Project ID: appgprj_6aa9e382728c81919bc0e800edfd4bc4
+- Slug: palau-ventas
+- URL publicada: https://palau-ventas.s9k2tm28hw.chatgpt.site/
+- El source de este Site es administrado internamente por ChatGPT Sites; NO es el repo GitHub ni la app Base44.
+- Referencia histórica observada: source version 11 / projection revision 19; posteriormente se confirmó al menos una publicación versión 20.
+
+Por lo tanto: NO buscar el origen del deploy en Base44 o GitHub. El destino correcto es ese proyecto de ChatGPT Sites. Si tu entorno no tiene herramientas de edición de ChatGPT Sites/Work, no podés publicar el cambio en esa URL exacta desde Claude y debés limitarte a preparar el parche/especificación para aplicar allí.
+
 NO alcanza con modificar Base44.
 NO afirmar que el trabajo está terminado si esa URL exacta no refleja el cambio.
 
