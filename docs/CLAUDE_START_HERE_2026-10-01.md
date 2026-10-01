@@ -23,12 +23,21 @@ IMPORTANTE:
 Existe otra app Base44 llamada "Palau Ventas" con ID 6abde8f562afd489151801e4.
 ESA ES UNA COPIA VIEJA/NO CANÓNICA. NO TRABAJAR SOBRE ESA APP.
 
-## URL que usa Ignacio
+## DESTINO PRODUCTIVO OBLIGATORIO
+
+La aplicación productiva que Ignacio usa y que debe recibir las modificaciones es EXACTAMENTE:
+
 https://palau-ventas.s9k2tm28hw.chatgpt.site/
 
-No asumir que esa URL está desplegada desde Base44 o GitHub hasta verificar la procedencia.
-No afirmar que un cambio en Base44 modifica esa URL sin comprobar el vínculo de despliegue.
+Esta URL deja de ser una referencia incierta: es el destino productivo indicado por Ignacio.
 
+Base44 app `Palau` (ID `6ab44f946746388d9ad48b68`) debe tratarse como fuente canónica de datos/esquema para comprender el modelo actual, pero NO como sustituto del deploy de la URL productiva.
+
+REGLA DE ACEPTACIÓN:
+- ningún cambio se considera terminado hasta que esa URL exacta refleje la modificación;
+- no publicar en una URL alternativa;
+- no rehacer la aplicación en otra plataforma;
+- si el código/proyecto disponible no controla esa URL, detenerse e identificar qué acceso o source falta antes de modificar otra cosa.
 ## Repo de continuidad
 https://github.com/nachopaluzzi-wq/palau-ventas
 
