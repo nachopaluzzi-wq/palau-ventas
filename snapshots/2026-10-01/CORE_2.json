@@ -1,0 +1,19 @@
+{
+  "captured_at": "2026-10-01",
+  "source": {
+    "platform": "Base44",
+    "app_name": "Palau",
+    "app_id": "6ab44f946746388d9ad48b68"
+  },
+  "entities": {
+    "RemitoItem": [],
+    "CajaMovimiento": [],
+    "Movimiento": [],
+    "Conciliacion": [],
+    "Visita": [],
+    "Consignacion": [],
+    "ConsignacionItem": [],
+    "DocumentoFuente": [],
+    "Gasto": []
+  }
+}
