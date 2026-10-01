@@ -29,6 +29,16 @@ La aplicación productiva que Ignacio usa y que debe recibir las modificaciones 
 
 https://palau-ventas.s9k2tm28hw.chatgpt.site/
 
+### Identidad del Site productivo
+- Plataforma: ChatGPT Sites / Work
+- Proyecto: Palau Ventas
+- Project ID: `appgprj_6aa9e382728c81919bc0e800edfd4bc4`
+- Slug: `palau-ventas`
+- El source es administrado por ChatGPT Sites; no proviene del repo GitHub ni de Base44.
+- Referencia histórica observada: source version 11 / projection revision 19; luego se confirmó al menos una publicación versión 20.
+
+Base44 sirve para esquema/datos de referencia, pero NO controla el deploy del Site.
+
 Esta URL deja de ser una referencia incierta: es el destino productivo indicado por Ignacio.
 
 Base44 app `Palau` (ID `6ab44f946746388d9ad48b68`) debe tratarse como fuente canónica de datos/esquema para comprender el modelo actual, pero NO como sustituto del deploy de la URL productiva.
