@@ -1,0 +1,333 @@
+{
+  "captured_at": "2026-10-01",
+  "source_app_id": "6ab44f946746388d9ad48b68",
+  "entities": {
+    "Cliente": [
+      {
+        "id": "6abd432e5e740b4ec25e424c",
+        "nombre_comercial": "Prado",
+        "estado": "ACTIVO"
+      },
+      {
+        "id": "6abcbffec64e396bbcaacfc3",
+        "nombre_comercial": "Charly",
+        "estado": "ACTIVO"
+      },
+      {
+        "id": "6abcbe22f12f14b3b2092de9",
+        "nombre_comercial": "Parque Falcon",
+        "estado": "ACTIVO"
+      },
+      {
+        "id": "6abcbe22f12f14b3b2092dea",
+        "nombre_comercial": "Parque Rosas",
+        "estado": "ACTIVO"
+      }
+    ],
+    "Remito": [
+      {
+        "id": "6abd72c4811f8067e77966b9",
+        "numero": "0005",
+        "fecha": "2026-09-30T20:30:00Z",
+        "cliente_id": "6abcbe22f12f14b3b2092de9",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "total_centavos": 1680000,
+        "idempotency_key": "PALAU-EXT-20260930-PARQUE-FALCON-16800"
+      },
+      {
+        "id": "6abd436d49d99867dee7099e",
+        "numero": "0004",
+        "fecha": "2026-09-30T17:14:30Z",
+        "cliente_id": "6abd432e5e740b4ec25e424c",
+        "pagador_id": "6abd432e5e740b4ec25e424c",
+        "total_centavos": 1680000,
+        "idempotency_key": "PALAU-EXT-20260930-PRADO-16800"
+      },
+      {
+        "id": "6abcbfc1ae195a3d6d9258bb",
+        "numero": "0003",
+        "fecha": "2026-09-29T14:06:35Z",
+        "cliente_id": "6abcbe22f12f14b3b2092de9",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "total_centavos": 1824000,
+        "idempotency_key": "remito-historico-falcon-original-11-2026-09-29"
+      },
+      {
+        "id": "6abcbe529da51b2746ce68e5",
+        "numero": "0001",
+        "fecha": "2026-09-30T10:00:00Z",
+        "cliente_id": "6abcbe22f12f14b3b2092de9",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "total_centavos": 2760000,
+        "idempotency_key": "remito-0001-2026-09-30"
+      },
+      {
+        "id": "6abcbe529da51b2746ce68e6",
+        "numero": "0002",
+        "fecha": "2026-09-30T11:00:00Z",
+        "cliente_id": "6abcbe22f12f14b3b2092dea",
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "total_centavos": 2760000,
+        "idempotency_key": "remito-0002-2026-09-30"
+      }
+    ],
+    "Cobranza": [
+      {
+        "id": "6abd72de886a35260b212cb1",
+        "fecha": "2026-09-30T20:30:00Z",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "importe_centavos": 1680000,
+        "idempotency_key": "PALAU-EXT-20260930-PARQUE-FALCON-16800:cobranza"
+      },
+      {
+        "id": "6abd437a116308f725410c31",
+        "fecha": "2026-09-30T17:14:30Z",
+        "pagador_id": "6abd432e5e740b4ec25e424c",
+        "importe_centavos": 1680000,
+        "idempotency_key": "COBRO-PALAU-EXT-20260930-PRADO-16800"
+      },
+      {
+        "id": "6abcbfcd1f2c850c0be9828d",
+        "fecha": "2026-09-29T14:06:35Z",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "importe_centavos": 4652000,
+        "idempotency_key": "cobranza-falcon-46520-efectivo-2026-09-29"
+      }
+    ],
+    "MovimientoStock": [
+      {
+        "id": "6abd72cf7eec2f9d16b02df5",
+        "fecha": "2026-09-30T20:30:00Z",
+        "tipo": "REMITO_SALIDA",
+        "documento": "0005",
+        "idempotency_key": "PALAU-EXT-20260930-PARQUE-FALCON-16800:stock"
+      },
+      {
+        "id": "6abd724fb1df330a61e439af",
+        "fecha": "2026-09-30T17:14:30Z",
+        "tipo": "REMITO_SALIDA",
+        "documento": "0004",
+        "idempotency_key": "PALAU-EXT-20260930-PRADO-16800:stock"
+      },
+      {
+        "id": "6abcbe3dcf6ede7ed54879b2",
+        "fecha": "2026-09-30T00:00:00Z",
+        "tipo": "SALDO_INICIAL",
+        "documento": null,
+        "idempotency_key": "saldo-inicial-camion-2026-09-30"
+      }
+    ],
+    "CuentaCorriente": [
+      {
+        "id": "6abddbdf10c3bed96ff8138a",
+        "fecha": "2026-10-01T04:04:46.823Z",
+        "tipo": "AJUSTE",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 68000,
+        "haber_centavos": 0,
+        "idempotency_key": "ajuste-falcon-redondeo-20261001",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abddbdf81d3772084c73c57",
+        "fecha": "2026-10-01T04:04:46.823Z",
+        "tipo": "AJUSTE",
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "debe_centavos": 0,
+        "haber_centavos": 2760000,
+        "idempotency_key": "ajuste-rosas-dup-0002-20261001",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd72d8d02be8c91fea3548",
+        "fecha": "2026-09-30T20:30:00Z",
+        "tipo": "VENTA",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 1680000,
+        "haber_centavos": 0,
+        "idempotency_key": "PALAU-EXT-20260930-PARQUE-FALCON-16800:cc:venta",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd72d8d02be8c91fea3549",
+        "fecha": "2026-09-30T20:30:00Z",
+        "tipo": "COBRANZA",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 0,
+        "haber_centavos": 1680000,
+        "idempotency_key": "PALAU-EXT-20260930-PARQUE-FALCON-16800:cc:cobranza",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd72b5c6db02930b4c10c9",
+        "fecha": "2026-09-29T14:06:35Z",
+        "tipo": "VENTA",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 1824000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-venta-falcon-remito-0003-18240",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd72b5c6db02930b4c10ca",
+        "fecha": "2026-09-29T14:06:35Z",
+        "tipo": "COBRANZA",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 0,
+        "haber_centavos": 4652000,
+        "idempotency_key": "cc-cobranza-falcon-46520",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd72b5c6db02930b4c10cb",
+        "fecha": "2026-09-30T07:00:00Z",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "debe_centavos": 858000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-regularizacion-rosas-8580",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd725393608061a5c0d98f",
+        "fecha": "2026-09-30T17:14:30Z",
+        "tipo": "COBRANZA",
+        "pagador_id": "6abd432e5e740b4ec25e424c",
+        "debe_centavos": 0,
+        "haber_centavos": 1680000,
+        "idempotency_key": "PALAU-EXT-20260930-PRADO-16800:cc:cobranza",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abd72515f409f4de2988cbe",
+        "fecha": "2026-09-30T17:14:30Z",
+        "tipo": "VENTA",
+        "pagador_id": "6abd432e5e740b4ec25e424c",
+        "debe_centavos": 1680000,
+        "haber_centavos": 0,
+        "idempotency_key": "PALAU-EXT-20260930-PRADO-16800:cc:venta",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcc002f56792d5b06a854d",
+        "fecha": "2026-09-30T00:00:00Z",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "pagador_id": "6abcbffec64e396bbcaacfc3",
+        "debe_centavos": 6840000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-regularizacion-charly-68400",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcbfbfc6e3e9815be58616",
+        "fecha": "2026-09-30T07:50:00Z",
+        "tipo": "AJUSTE",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 0,
+        "haber_centavos": 2760000,
+        "idempotency_key": "cc-reversa-remito-0001-falcon-2026-09-30",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcbfbfc6e3e9815be58617",
+        "fecha": "2026-09-29T14:00:00Z",
+        "tipo": "SALDO_INICIAL",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 2828000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-saldo-previo-falcon-28280-2026-09-29",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcbe5fd6801a254c91fe01",
+        "fecha": "2026-09-30T07:00:00Z",
+        "tipo": "SALDO_INICIAL",
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "debe_centavos": 4210000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-saldo-inicial-rosas-2026-09-30",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcbe5fd6801a254c91fe02",
+        "fecha": "2026-09-30T12:00:00Z",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "debe_centavos": 2760000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-remito-0002-rosas",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcbe5fd6801a254c91fe03",
+        "fecha": "2026-09-30T15:00:00Z",
+        "tipo": "AJUSTE",
+        "pagador_id": "6abcbe22f12f14b3b2092dea",
+        "debe_centavos": 0,
+        "haber_centavos": 5000000,
+        "idempotency_key": "cc-pago-rosas-2026-09-30",
+        "estado": "CONFIRMADO"
+      },
+      {
+        "id": "6abcbe5fd6801a254c91fe04",
+        "fecha": "2026-09-30T10:30:00Z",
+        "tipo": "REGULARIZACION_HISTORICA",
+        "pagador_id": "6abcbe22f12f14b3b2092de9",
+        "debe_centavos": 2760000,
+        "haber_centavos": 0,
+        "idempotency_key": "cc-remito-0001-falcon",
+        "estado": "CONFIRMADO"
+      }
+    ],
+    "Auditoria": [
+      {
+        "id": "6abd72f0d9f10417a012182f",
+        "fecha": "2026-09-30T20:36:55Z",
+        "accion": "REGULARIZAR_CUENTA_PARQUE",
+        "entidad": "CuentaCorriente",
+        "registro_id": "6abcbe22f12f14b3b2092de9",
+        "documento": "Parque Falcon / Parque Rosas"
+      },
+      {
+        "id": "6abd72f0d9f10417a0121830",
+        "fecha": "2026-09-30T20:36:55Z",
+        "accion": "CONFIRMAR_REMITO",
+        "entidad": "Remito",
+        "registro_id": "6abd72c4811f8067e77966b9",
+        "documento": "0005"
+      },
+      {
+        "id": "6abd727d442937eaa0e3ed72",
+        "fecha": "2026-09-30T20:34:35Z",
+        "accion": "REGULARIZAR_EFECTOS_REMITO",
+        "entidad": "Remito",
+        "registro_id": "6abd436d49d99867dee7099e",
+        "documento": "0004"
+      },
+      {
+        "id": "6abd4e7acd6a9c2990956132",
+        "fecha": "2026-09-30T18:01:18Z",
+        "accion": "CORREGIR_TRAZABILIDAD_COBRANZA",
+        "entidad": "Cobranza",
+        "registro_id": "6abd437a116308f725410c31",
+        "documento": "0004"
+      },
+      {
+        "id": "6abd438ce2bfa04724ffc846",
+        "fecha": "2026-09-30T17:14:30Z",
+        "accion": "CREAR_REMITO",
+        "entidad": "Remito",
+        "registro_id": "6abd436d49d99867dee7099e",
+        "documento": "0004"
+      },
+      {
+        "id": "6abd438ce2bfa04724ffc847",
+        "fecha": "2026-09-30T17:14:30Z",
+        "accion": "REGISTRAR_COBRANZA",
+        "entidad": "Cobranza",
+        "registro_id": "6abd437a116308f725410c31",
+        "documento": "0004"
+      }
+    ]
+  }
+}
