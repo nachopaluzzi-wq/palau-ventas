@@ -1,0 +1,187 @@
+{
+  "captured_at": "2026-10-01",
+  "source": {
+    "platform": "Base44",
+    "app_name": "Palau",
+    "app_id": "6ab44f946746388d9ad48b68"
+  },
+  "entities": {
+    "PuntoVenta": [
+      {
+        "estado": "ACTIVO",
+        "observaciones": "Punto de venta inicial. El responsable se asigna desde Usuarios.",
+        "codigo": "0001",
+        "nombre": "Camión principal",
+        "ubicacion_stock_id": "6abc851abb58da8ba7829b41",
+        "responsable_user_id": null,
+        "id": "6abc8520891548551eab82e7",
+        "created_date": "2026-09-30T03:42:24.963000",
+        "updated_date": "2026-09-30T03:42:24.963000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "Socio": [
+      {
+        "user_id": "6ab44f976746388d9ad48b6e",
+        "vigencia_desde": "2026-09-01",
+        "nombre": "Ignacio",
+        "motivo": "Configuración inicial según especificación y DELTA",
+        "activo": true,
+        "porcentaje": 50,
+        "id": "6abc851b50f345f3282df55c",
+        "created_date": "2026-09-30T03:42:19.535000",
+        "updated_date": "2026-09-30T03:42:19.535000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "user_id": null,
+        "vigencia_desde": "2026-09-01",
+        "nombre": "Enzo",
+        "motivo": "Configuración inicial. Ser socio no otorga rol de vendedor.",
+        "activo": true,
+        "porcentaje": 50,
+        "id": "6abc851b50f345f3282df55d",
+        "created_date": "2026-09-30T03:42:19.535000",
+        "updated_date": "2026-09-30T03:42:19.535000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "User": [
+      {
+        "role": "admin",
+        "id": "6ab44f976746388d9ad48b6e",
+        "created_date": "2026-09-23T22:15:51.843000Z",
+        "updated_date": "2026-09-23T22:15:51.843000Z",
+        "email": "nachopaluzzi@gmail.com",
+        "full_name": "Nacho Paluzzi",
+        "disabled": null,
+        "disabled_reason": null,
+        "is_verified": true,
+        "force_password_reset": false,
+        "app_id": "6ab44f946746388d9ad48b68",
+        "is_service": false,
+        "collaborator_role": "editor",
+        "_app_role": "admin"
+      }
+    ],
+    "CargaCamion": [],
+    "CargaDetalle": [],
+    "Categoria": [
+      {
+        "descripcion": "Artículos para el hogar",
+        "color": "#10b981",
+        "nombre": "Hogar",
+        "id": "6ab4500d6746388d9ad48c00",
+        "created_date": "2026-09-23T22:17:49.366000",
+        "updated_date": "2026-09-23T22:17:49.366000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "descripcion": "Útiles de oficina",
+        "color": "#8b5cf6",
+        "nombre": "Papelería",
+        "id": "6ab4500d6746388d9ad48c03",
+        "created_date": "2026-09-23T22:17:49.366000",
+        "updated_date": "2026-09-23T22:17:49.366000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "descripcion": "Dispositivos y gadgets",
+        "color": "#3b82f6",
+        "nombre": "Electrónica",
+        "id": "6ab4500d6746388d9ad48bff",
+        "created_date": "2026-09-23T22:17:49.366000",
+        "updated_date": "2026-09-23T22:17:49.366000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "descripcion": "Vestimenta y accesorios",
+        "color": "#f59e0b",
+        "nombre": "Ropa",
+        "id": "6ab4500d6746388d9ad48c01",
+        "created_date": "2026-09-23T22:17:49.366000",
+        "updated_date": "2026-09-23T22:17:49.366000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "descripcion": "Productos comestibles",
+        "color": "#ef4444",
+        "nombre": "Alimentos",
+        "id": "6ab4500d6746388d9ad48c02",
+        "created_date": "2026-09-23T22:17:49.366000",
+        "updated_date": "2026-09-23T22:17:49.366000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "Proveedor": [
+      {
+        "contacto": "María Gómez",
+        "notas": "Artículos de hogar",
+        "direccion": "Calle Industrial 500, Córdoba",
+        "telefono": "+54 11 5555-2000",
+        "nombre": "Hogar Integral",
+        "email": "compras@hogarintegral.com",
+        "activo": true,
+        "id": "6ab4a97f83d3a1db1988ea9f",
+        "created_date": "2026-09-24T04:39:27.343000",
+        "updated_date": "2026-09-24T04:39:27.343000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "contacto": "Lucía Torres",
+        "notas": "Alimentos no perecederos",
+        "direccion": "Mercado Central, CABA",
+        "telefono": "+54 11 5555-4000",
+        "nombre": "Alimentos Frescos",
+        "email": "info@alimentosfrescos.com",
+        "activo": true,
+        "id": "6ab4a97f83d3a1db1988eaa1",
+        "created_date": "2026-09-24T04:39:27.343000",
+        "updated_date": "2026-09-24T04:39:27.343000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "contacto": "Carlos Ruiz",
+        "notas": "Ropa y accesorios",
+        "direccion": "Ruta 9 Km 50, Tucumán",
+        "telefono": "+54 11 5555-3000",
+        "nombre": "Textiles del Norte",
+        "email": "pedidos@textilesnorte.com",
+        "activo": true,
+        "id": "6ab4a97f83d3a1db1988eaa0",
+        "created_date": "2026-09-24T04:39:27.343000",
+        "updated_date": "2026-09-24T04:39:27.343000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      },
+      {
+        "contacto": "Juan Pérez",
+        "notas": "Proveedor principal de electrónica",
+        "direccion": "Av. Corrientes 1234, CABA",
+        "telefono": "+54 11 5555-1000",
+        "nombre": "Distribuidora Tech S.A.",
+        "email": "ventas@distribuidoratech.com",
+        "activo": true,
+        "id": "6ab4a97f83d3a1db1988ea9e",
+        "created_date": "2026-09-24T04:39:27.343000",
+        "updated_date": "2026-09-24T04:39:27.343000",
+        "created_by_id": "6ab44f976746388d9ad48b6e",
+        "is_sample": false
+      }
+    ],
+    "Vehiculo": [],
+    "ActivoComodato": [],
+    "ReglaMargen": [],
+    "OrdenCompra": []
+  }
+}
