@@ -1,0 +1,122 @@
+CREÁ UNA NUEVA APLICACIÓN PALAU VENTAS EN UN HOSTING INDEPENDIENTE, MIGRANDO TODO EL ESTADO ACTUAL SIN PERDER CLIENTES, IDs, TRAZABILIDAD NI HISTORIA.
+
+REPOSITORIO FUENTE:
+https://github.com/nachopaluzzi-wq/palau-ventas
+
+NO EMPIECES PROGRAMANDO HASTA LEER, EN ESTE ORDEN:
+
+1. migration/00_CLAUDE_NEW_APP_MASTER_PROMPT.md
+2. migration/README.md
+3. docs/SPEC_MAESTRA_PALAU_2026-09-27.txt
+4. docs/ARCHITECTURE_VERIFIED_2026-09-30.md
+5. docs/ATOMIC_FLOW_DESIGN_CORRECTED.md
+6. docs/CHAT_RECOVERY_2026-09-30.md
+7. docs/PRODUCTIVE_RECONCILIATION_2026-09-30.md
+8. snapshots/2026-10-01/BASE44_SCHEMAS.json
+9. snapshots/2026-10-01/CORE_1.json
+10. snapshots/2026-10-01/CORE_2.json
+11. snapshots/2026-10-01/MASTERS_1.json
+12. snapshots/2026-10-01/MASTERS_2.json
+13. migration/01_schema.sql
+14. migration/02_import_snapshots.ts
+15. migration/03_validate_migration.ts
+16. migration/04_update_client_service.ts
+17. migration/05_CLIENT_EDIT_V2.md
+18. migration/06_CUTOVER_CHECKLIST.md
+19. migration/07_RECORD_COUNTS.json
+
+CONDICIONES NO NEGOCIABLES:
+
+- No crear una demo.
+- No inventar datos.
+- No cambiar IDs.
+- No borrar datos históricos.
+- No convertir nombres en claves.
+- No recalcular ni reescribir remitos, cobranzas, precios o auditorías históricas.
+- No usar campos de stock como fuente de verdad.
+- Stock = movimientos.
+- Cuenta corriente = movimientos por pagador.
+- Documentos confirmados son inmutables.
+- Anulación = reversión explícita.
+- Auditoria = append-only.
+- Permisos validados en backend.
+- Cliente/Sucursal/Pagador son conceptos separados.
+- Migrar primero una copia cruda inmutable de TODOS los registros.
+- Conservar el JSON completo original de cada registro.
+- La nueva app debe usar PostgreSQL y transacciones.
+- Mantener mobile-first y la operatoria simple.
+
+LA IMPORTACIÓN INICIAL DEBE COINCIDIR EXACTAMENTE CON ESTOS CONTEOS:
+
+Remito 5
+Cobranza 3
+MovimientoStock 3
+CuentaCorriente 16
+Anulacion 1
+Auditoria 6
+OperacionRemito 2
+Presupuesto 2
+PresupuestoItem 4
+Cliente 4
+Articulo 38
+PrecioProducto 6
+ListaPrecio 3
+Deposito 2
+PuntoVenta 1
+Socio 2
+User 1
+Categoria 5
+Proveedor 4
+
+Las demás entidades presentes en los snapshots tienen 0 registros y deben quedar en 0; NO rellenarlas con datos demo.
+
+MIGRACIÓN:
+
+1. Crear PostgreSQL vacío.
+2. Ejecutar migration/01_schema.sql.
+3. Ejecutar migration/02_import_snapshots.ts.
+4. Ejecutar migration/03_validate_migration.ts.
+5. Si validation-report no devuelve PASS_AUTOMATIC_CHECKS, NO continuar al corte.
+6. Resolver cualquier conflicto usando evidencia; nunca inventar.
+7. Construir la interfaz y servicios encima del estado migrado.
+8. Implementar edición de clientes usando migration/04_update_client_service.ts y migration/05_CLIENT_EDIT_V2.md.
+9. Ejecutar migration/06_CUTOVER_CHECKLIST.md completa.
+10. Si hubo operaciones nuevas en Base44 desde el snapshot, hacer un delta por ID/idempotency_key antes del corte.
+11. Revalidar todo.
+12. Publicar la nueva app.
+13. Entregar a Ignacio URL, estado de migración, validation-report y listado de cualquier punto PARA_REVISAR.
+
+CLIENTES:
+
+Deben conservarse EXACTAMENTE los 4 clientes actuales y sus IDs.
+No fusionar, no renombrar, no limpiar observaciones durante la importación.
+
+La edición posterior:
+- solo ADMIN;
+- mismo Cliente.id;
+- FUSIONADO terminal/no editable;
+- ACTIVO/ARCHIVADO administrables;
+- nombres_anteriores sin duplicados;
+- concurrencia por version;
+- lista válida si ListaPrecio.activa === true;
+- punto válido si PuntoVenta.estado !== ARCHIVADO;
+- auditoría dentro de la misma transacción;
+- cero impacto en stock, remitos, cobranzas y cuenta corriente.
+
+NO ME ENTREGUES SOLO DOCUMENTACIÓN.
+QUIERO UNA APP FUNCIONAL, MIGRADA Y PUBLICABLE.
+
+ANTES DE DECIR "LISTO", DEMOSTRÁ:
+- conteos exactos;
+- mismos IDs;
+- cero conflictos de migración;
+- clientes e historia intactos;
+- remitos/cobranzas consultables;
+- stock derivado de movimientos;
+- cuenta corriente derivada de movimientos;
+- auditoría preservada;
+- permisos backend funcionando;
+- edición de clientes v2 funcionando;
+- URL pública funcionando.
+
+Si encontrás una diferencia histórica, frená esa parte y marcala PARA_REVISAR. NO LA CORRIJAS ADIVINANDO.
