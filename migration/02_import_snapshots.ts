@@ -175,8 +175,8 @@ async function main() {
                 (entity_name, id, data, version, source_hash, source_batch_id, created_at, updated_at)
                VALUES (
                  $1,$2,$3::jsonb,1,$4,$5,
-                 COALESCE(($3::jsonb->>'created_date')::timestamptz, now()),
-                 COALESCE(($3::jsonb->>'updated_date')::timestamptz, now())
+                 COALESCE(NULLIF($3::jsonb->>'created_date','')::timestamptz, now()),
+                 COALESCE(NULLIF($3::jsonb->>'updated_date','')::timestamptz, now())
                )`,
               [entityName, legacyId, JSON.stringify(row), hash, batchId],
             );
