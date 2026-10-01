@@ -1,0 +1,28 @@
+Abrí y trabajá sobre este repo: https://github.com/nachopaluzzi-wq/palau-ventas
+
+LEÉ PRIMERO:
+- docs/CLAUDE_START_HERE_2026-10-01.md
+- docs/SPEC_MAESTRA_PALAU_2026-09-27.txt
+- docs/ARCHITECTURE_VERIFIED_2026-09-30.md
+- docs/ATOMIC_FLOW_DESIGN_CORRECTED.md
+- docs/CHAT_RECOVERY_2026-09-30.md
+- docs/PRODUCTIVE_RECONCILIATION_2026-09-30.md
+- snapshots/2026-10-01/
+
+Fuente productiva correcta:
+Base44 app "Palau"
+App ID: 6ab44f946746388d9ad48b68
+
+NO trabajar sobre la app Base44 vieja:
+"Palau Ventas"
+ID: 6abde8f562afd489151801e4
+
+URL que usa Ignacio:
+https://palau-ventas.s9k2tm28hw.chatgpt.site/
+
+Objetivo inmediato:
+Habilitar EDICIÓN DE CLIENTES para ADMIN manteniendo el mismo Cliente.id, todas las relaciones, historial y trazabilidad. Al cambiar nombre_comercial, guardar el anterior en nombres_anteriores sin duplicarlo. Crear Auditoria con valor anterior y nuevo. Editar cliente NO puede modificar stock, cuenta corriente, remitos ni cobranzas.
+
+No rehagas la app, no inventes datos, no reconstruyas saldos ni stock y no cambies arquitectura sin necesidad. Primero implementá y verificá esta edición de clientes. Después frená y mostrame el resultado antes de hacer otra reforma.
+
+Si la URL chatgpt.site no está vinculada al código/repositorio que estás editando, detectalo y decímelo antes de afirmar que el cambio quedó publicado.
