@@ -56,6 +56,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 .modal{position:fixed;inset:0;background:rgba(15,43,70,.56);display:flex;align-items:flex-end;justify-content:center;z-index:60;padding:0}.sheet{width:min(700px,100%);background:#fff;border-radius:30px 30px 0 0;padding:24px;max-height:92vh;overflow:auto}.sheet h3{margin:0 0 14px;font-size:23px}.close{float:right;border:0;background:#edf3f7;border-radius:50%;width:38px;height:38px;color:var(--ink);font-size:22px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:98px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:14px;z-index:90;max-width:90%;font-size:13px}.toast.err{background:#922b21}
 .admin-note,.history-info{background:#eaf6fd;border:1px solid #c9e2f0;color:#286f99;border-radius:23px;padding:17px 18px;font-size:14px;line-height:1.55;margin-bottom:18px}
+.review-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.review-actions .btn{flex:1;min-width:92px}.evidence{margin-top:12px;padding:12px;border-radius:14px;background:#f7fafc;border:1px solid var(--line);font-size:13px;line-height:1.48;color:#52687c}.review-type{font-size:10px;font-weight:900;letter-spacing:.09em;color:#6b7e90;text-transform:uppercase}.review-count{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#fff4d6;color:var(--amber);font-size:12px;font-weight:900;margin-left:8px}
 .history-card{padding:20px}.history-card .history-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.history-card .history-name{font-size:18px;font-weight:900}.history-card .history-value{font-size:17px;font-weight:900;text-align:right}.history-card .history-note{font-size:14px;line-height:1.55;margin-top:14px}.history-card .history-source{border-top:1px solid var(--line);margin-top:15px;padding-top:12px;color:var(--muted);font-size:13px}
 .order-card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:20px;margin-bottom:13px}.order-top{display:flex;justify-content:space-between;gap:16px}.order-number{font-size:20px;margin-top:9px}.order-total{font-size:20px;font-weight:900}.doc-action{width:100%;border:0;border-radius:15px;background:#e6f1f8;color:#285f82;font-weight:900;font-size:17px;padding:14px;margin-top:16px}
 .desktop-nav{display:none}
@@ -75,9 +76,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
    <div style="font-weight:900;font-size:18px">Ingresar</div>
    <div class="hint">Elegí tu usuario asignado a este celular.</div>
    <label>Usuario</label><select id="loginUser"><option>Cargando usuarios…</option></select>
-   <label>PIN / clave actual</label><input id="loginPin" class="pin" type="password" inputmode="numeric" autocomplete="current-password">
+   <label>PIN</label><input id="loginPin" class="pin" type="password" inputmode="numeric" autocomplete="current-password">
    <button id="loginBtn" class="btn primary full" style="margin-top:16px">Ingresar</button>
-   <div class="hint">La sesión queda guardada en este celular durante 90 días.</div>
+   <div class="hint">La sesión se mantiene mientras uses la app.</div>
   </div>
  </div>
 </section>
@@ -101,6 +102,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
     <button class="q" onclick="go('stock')"><div class="icon">▤</div><strong>Stock</strong><span>Por depósito</span></button>
     <button class="q" onclick="go('orders')"><div class="icon">▤</div><strong>Pedidos</strong><span>Presupuestos y remitos</span></button>
     <button class="q" onclick="go('accounts')"><div class="icon">📒</div><strong>Cuentas</strong><span>Saldos y movimientos</span></button>
+    <button class="q adminOnly" onclick="go('review')"><div class="icon">✓</div><strong>Revisión</strong><span>Validar historial</span></button>
    </div>
    <div class="stats">
     <div class="stat"><div class="k">Clientes</div><div class="v" id="sClients">—</div></div>
@@ -158,6 +160,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
     <button class="more" onclick="go('orders')"><b>Pedidos</b><span>Presupuestos y remitos</span></button>
     <button class="more" onclick="go('accounts')"><b>Cuentas corrientes</b><span>Saldo y movimientos por pagador</span></button>
     <button class="more" onclick="go('history')"><b>Historial previo</b><span>Registros anteriores al uso de la app</span></button>
+    <button class="more" onclick="go('stock')"><b>Stock</b><span>Existencias por depósito</span></button>
+    <button class="more adminOnly" onclick="go('review')"><b>Revisión histórica <span id="reviewMenuCount" class="review-count">0</span></b><span>Validar, corregir, unificar o descartar evidencia recuperada</span></button>
     <button class="more" onclick="go('transfers')"><b>Transferencias</b><span>Movimientos entre depósitos</span></button>
     <button class="more" onclick="go('prices')"><b>Lista de precios</b><span>Precios vigentes e historial</span></button>
     <button class="more adminOnly" onclick="go('users')"><b>Usuarios</b><span>PIN, rol y depósito</span></button>
@@ -175,6 +179,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
    <div class="page-head"><button class="back-btn" onclick="go('more')">‹</button><div class="page-copy"><h2>Historial previo</h2><div class="page-sub">Registros informados antes de usar la app</div></div></div>
    <div class="history-info">Estos datos conservan lo informado en la conversación y la planilla histórica. Un importe cobrado no significa por sí solo que la cuenta quedó en cero. Los registros pendientes se mantienen separados hasta poder conciliarlos con ventas, remitos, cobranzas y stock.</div>
    <div id="historyList"></div>
+  </section>
+
+  <section class="page" id="p-review">
+   <div class="page-head"><button class="back-btn" onclick="go('more')">‹</button><div class="page-copy"><h2>Revisión histórica</h2><div class="page-sub">Sólo las excepciones que no pudieron resolverse automáticamente</div></div></div>
+   <div class="history-info">El sistema ya reconstruyó todo lo que pudo respaldar con la app vieja, documentos y conversaciones. Acá sólo quedan decisiones ambiguas. Validar confirma el dato; descartar lo excluye sin borrarlo; corregir conserva el antes y el después; unificar mantiene el nombre viejo como alias.</div>
+   <div class="stats" style="margin-bottom:18px">
+    <div class="stat"><div class="k">Clientes</div><div class="v" id="rvClients">0</div></div>
+    <div class="stat"><div class="k">Cuentas</div><div class="v" id="rvAccounts">0</div></div>
+    <div class="stat"><div class="k">Stock</div><div class="v" id="rvStock">0</div></div>
+    <div class="stat"><div class="k">Remitos</div><div class="v" id="rvRemits">0</div></div>
+   </div>
+   <div id="reviewList"></div>
+   <div class="section-title">Decisiones recientes</div>
+   <div id="reviewDecisions"></div>
   </section>
 
   <section class="page" id="p-budgets"><div class="page-head"><button class="back-btn" onclick="go('orders')">‹</button><div class="page-copy"><h2>Presupuestos</h2><div class="page-sub">Documentos pendientes de remito</div></div><button class="btn primary" onclick="go('order');document.getElementById('oType').value='budget';syncDoc()">＋ Nuevo</button></div><div id="budgetList"></div></section>
@@ -200,26 +218,26 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 <div id="modal" class="modal hidden"><div class="sheet"><button class="close" onclick="closeModal()">×</button><h3 id="modalTitle"></h3><div id="modalBody"></div></div></div>
 <div id="toast" class="toast hidden"></div>
 <script>
-const API='https://ouelrddwbmqwabnviyro.supabase.co/functions/v1/api'; let me=null,clients=[],branches=[],products=[],depots=[],accounts=[],remits=[],budgets=[],collections=[],stock=[],transfers=[],cart={},tDraft=[];
+const API='https://ouelrddwbmqwabnviyro.supabase.co/functions/v1/api'; let me=null,clients=[],branches=[],products=[],depots=[],accounts=[],remits=[],budgets=[],collections=[],stock=[],transfers=[],cart={},tDraft=[],reviewData=null;
 const $=id=>document.getElementById(id), money=c=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(c||0)/100), esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])), dt=s=>s?new Date(s).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}):'—';
 function toast(m,e=false){let t=$('toast');t.textContent=m;t.className='toast'+(e?' err':'');setTimeout(()=>t.className='toast hidden',3200)}
-async function api(p,o={}){const token=localStorage.getItem('palau_session_token')||'';const headers={'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(o.headers||{})};let r=await fetch(API+p,{credentials:'same-origin',headers,...o}),d={};try{d=await r.json()}catch{}if(!r.ok){let x=new Error(d.error||'Error');x.status=r.status;x.data=d;throw x}return d}
+async function api(p,o={}){const token=sessionStorage.getItem('palau_session_token')||'';const headers={'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(o.headers||{})};let r=await fetch(API+p,{credentials:'same-origin',headers,...o}),d={};try{d=await r.json()}catch{}if(!r.ok){let x=new Error(d.error||'Error');x.status=r.status;x.data=d;throw x}return d}
 function openModal(t,h){$('modalTitle').textContent=t;$('modalBody').innerHTML=h;$('modal').classList.remove('hidden')}function closeModal(){$('modal').classList.add('hidden')}
 function b(status){status=String(status||'').toUpperCase();let c=status.includes('CONFIRM')||status==='OK'||status==='ACTIVO'?'ok':status.includes('REVIEW')||status.includes('PEND')||status==='DRAFT'?'review':status.includes('VOID')||status.includes('INACT')?'bad':'';return '<span class="badge '+c+'">'+esc(status)+'</span>'}
-const nav=[['home','⌂','Inicio'],['clients','◎','Clientes'],['order','＋','Venta'],['collections','▣','Cobrar'],['orders','▤','Pedidos'],['accounts','≡','Cuentas'],['stock','□','Stock'],['more','☰','Más']];
+const nav=[['home','⌂','Inicio'],['clients','◎','Clientes'],['order','＋','Pedido'],['collections','▣','Cobrar'],['more','☰','Más']];
 function buildDesktop(){ $('desktopNav').innerHTML=nav.map(x=>'<button data-p="'+x[0]+'">'+x[1]+' '+x[2]+'</button>').join(''); document.querySelectorAll('#desktopNav button').forEach(x=>x.onclick=()=>go(x.dataset.p));}
 function go(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('p-'+p)?.classList.add('active');document.querySelectorAll('[data-p]').forEach(x=>x.classList.toggle('active',x.dataset.p===p));loadPage(p)}
 document.querySelectorAll('#bottomNav button').forEach(x=>x.onclick=()=>go(x.dataset.p));buildDesktop();
 
-async function loadLoginOptions(){try{let d=await api('/auth/options');$('loginUser').innerHTML=(d.data||[]).map(x=>'<option value="'+esc(x.email)+'">'+esc(x.display_name)+(x.default_depot_id?' · depósito asignado':'')+'</option>').join('')||'<option>Sin usuarios</option>'}catch(e){toast(e.message,true)}}
-$('loginBtn').onclick=async()=>{try{let d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:$('loginUser').value,password:$('loginPin').value})});if(d.session_token)localStorage.setItem('palau_session_token',d.session_token);me=d.user;await enter()}catch(e){toast(e.message,true)}}
+async function loadLoginOptions(){try{let d=await api('/auth/options'),rows=d.data||[];$('loginUser').innerHTML=rows.map(x=>'<option value="'+esc(x.email)+'">'+esc(x.display_name)+'</option>').join('')||'<option>Sin usuarios</option>';let ign=rows.find(x=>String(x.display_name||'').toLowerCase().includes('ignacio'));if(ign)$('loginUser').value=ign.email}catch(e){toast(e.message,true)}}
+$('loginBtn').onclick=async()=>{try{let d=await api('/auth/login',{method:'POST',body:JSON.stringify({email:$('loginUser').value,password:$('loginPin').value})});if(d.session_token)sessionStorage.setItem('palau_session_token',d.session_token);me=d.user;await enter()}catch(e){toast(e.message,true)}}
 async function boot(){try{let d=await api('/auth/me');me=d.user;await enter()}catch{await loadLoginOptions()}}
 async function enter(){$('login').classList.add('hidden');$('app').classList.remove('hidden');$('userName').textContent=me.display_name;$('hello').textContent='Hola, '+(me.display_name?.split(' ')[0]||'');$('roleEyebrow').textContent=me.role==='ADMIN'?'ADMINISTRACIÓN':'OPERACIÓN';document.querySelectorAll('.adminOnly').forEach(x=>x.classList.toggle('hidden',me.role!=='ADMIN'));$('stockAdjustBtn').classList.toggle('hidden',me.role!=='ADMIN');if(me.must_change_password){pinChange();return}await refresh()}
 function pinChange(){openModal('Elegí tu PIN de 4 números','<div class="admin-note">La clave heredada se reemplaza por tu PIN personal. Después el ingreso queda como en la app vieja.</div><div class="label">Clave actual</div><input id="oldp" class="field" type="password"><div class="label">Nuevo PIN</div><input id="newp" class="field pin" maxlength="4" inputmode="numeric" type="password"><button id="pinsave" class="btn primary full" style="margin-top:12px">Guardar PIN</button>');$('pinsave').onclick=async()=>{try{await api('/auth/change-password',{method:'POST',body:JSON.stringify({old_password:$('oldp').value,new_password:$('newp').value})});me.must_change_password=false;closeModal();toast('PIN actualizado');await refresh()}catch(e){toast(e.message,true)}}}
-async function logout(){try{await api('/auth/logout',{method:'POST'})}catch{}localStorage.removeItem('palau_session_token');location.reload()}
+async function logout(){try{await api('/auth/logout',{method:'POST'})}catch{}sessionStorage.removeItem('palau_session_token');location.reload()}
 
 async function refresh(){await Promise.all([loadClients(),loadProducts(),loadDepots(),loadAccounts()]);fillSelects();await Promise.all([loadHome(),loadRemits(),loadCollections(),loadStock(),loadBudgets()])}
-async function loadPage(p){try{if(p==='home')return loadHome();if(p==='clients')return renderClients();if(p==='order')return renderProducts();if(p==='collections')return loadCollections();if(p==='remittances')return loadRemits();if(p==='orders')return renderOrders();if(p==='history')return renderHistory();if(p==='accounts')return loadAccounts();if(p==='stock')return loadStock();if(p==='budgets')return loadBudgets();if(p==='transfers')return loadTransfers();if(p==='prices')return renderPrices();if(p==='users')return loadUsers();if(p==='audit')return loadAudit()}catch(e){toast(e.message,true)}}
+async function loadPage(p){try{if(p==='home')return loadHome();if(p==='clients')return renderClients();if(p==='order')return renderProducts();if(p==='collections')return loadCollections();if(p==='remittances')return loadRemits();if(p==='orders')return renderOrders();if(p==='history')return renderHistory();if(p==='review')return loadReview();if(p==='accounts')return loadAccounts();if(p==='stock')return loadStock();if(p==='budgets')return loadBudgets();if(p==='transfers')return loadTransfers();if(p==='prices')return renderPrices();if(p==='users')return loadUsers();if(p==='audit')return loadAudit()}catch(e){toast(e.message,true)}}
 
 
 function renderHistory(){
@@ -239,6 +257,81 @@ function renderHistory(){
     return '<div class="history-card"><div class="history-head"><div class="history-name">'+esc(c.name)+'</div><div class="history-value">'+esc(value)+'</div></div><div class="meta">'+(c.review_status==='REVIEW'?'Pendiente · sin conciliar completamente':'Histórico · pendiente de vinculación')+'</div><div class="history-note">'+esc(n.replace(/\nFuente:.*$/s,'')||'Sin detalle adicional documentado.')+'</div><div class="history-source">'+esc(source)+'</div></div>';
   }).join('')||'<div class="card">No hay registros históricos pendientes.</div>';
 }
+
+async function loadReview(){
+  if(me?.role!=='ADMIN')return;
+  try{
+    let d=await api('/review');reviewData=d.data||{};
+    let c=reviewData.counts||{};
+    $('rvClients').textContent=c.clients||0;$('rvAccounts').textContent=c.account_movements||0;$('rvStock').textContent=c.stock_movements||0;$('rvRemits').textContent=c.remittances||0;
+    let total=Number(c.clients||0)+Number(c.account_movements||0)+Number(c.stock_movements||0)+Number(c.remittances||0);
+    if($('reviewMenuCount'))$('reviewMenuCount').textContent=total;
+    renderReview();
+  }catch(e){toast(e.message,true)}
+}
+function reviewCard(type,title,meta,note,actions){
+  return '<div class="history-card"><div class="review-type">'+esc(type)+'</div><div class="history-head"><div class="history-name">'+esc(title)+'</div><div class="history-value">'+esc(meta||'')+'</div></div>'+(note?'<div class="evidence">'+esc(note)+'</div>':'')+'<div class="review-actions">'+actions+'</div></div>';
+}
+function renderReview(){
+  if(!reviewData)return;
+  let html='';
+  for(const c of reviewData.clients||[]){
+    html+=reviewCard('Cliente',c.name,c.legacy_source||'Pendiente',c.notes||'Sin nota',
+      '<button class="btn good" onclick="reviewAction(\'client\',\''+c.id+'\',\'VALIDATE\')">Validar</button>'+
+      '<button class="btn" onclick="reviewEditClient(\''+c.id+'\')">Corregir</button>'+
+      '<button class="btn" onclick="reviewMergeClient(\''+c.id+'\')">Unificar</button>'+
+      '<button class="btn danger" onclick="reviewAction(\'client\',\''+c.id+'\',\'DISCARD\')">Descartar</button>');
+  }
+  for(const m of reviewData.account_movements||[]){
+    html+=reviewCard('Cuenta corriente',m.payer_name,money(m.signed_cents),dt(m.occurred_at)+' · '+(m.reference||'')+'\n'+(m.notes||''),
+      '<button class="btn good" onclick="reviewAction(\'account\',\''+m.id+'\',\'VALIDATE\')">Validar</button>'+
+      '<button class="btn" onclick="reviewCorrectAccount(\''+m.id+'\')">Corregir</button>'+
+      '<button class="btn danger" onclick="reviewAction(\'account\',\''+m.id+'\',\'DISCARD\')">Descartar</button>');
+  }
+  for(const m of reviewData.stock_movements||[]){
+    let parts=(m.items||[]).map(x=>x.product_name+' · '+x.quantity_base_units+' u.').join(' · ');
+    let route=(m.source_depot?.name||'—')+' → '+(m.dest_depot?.name||'—');
+    html+=reviewCard('Stock',m.movement_type,route,dt(m.occurred_at)+'\n'+parts+'\n'+(m.notes||''),
+      '<button class="btn good" onclick="reviewAction(\'stock\',\''+m.id+'\',\'VALIDATE\')">Validar</button>'+
+      '<button class="btn" onclick="reviewCorrectStock(\''+m.id+'\')">Corregir depósito</button>'+
+      '<button class="btn danger" onclick="reviewAction(\'stock\',\''+m.id+'\',\'DISCARD\')">Descartar</button>');
+  }
+  for(const r of reviewData.remittances||[]){
+    html+=reviewCard('Remito',r.number+' · '+r.client_name,money(r.total_cents),dt(r.occurred_at)+'\n'+(r.notes||''),
+      '<button class="btn good" onclick="reviewAction(\'remittance\',\''+r.id+'\',\'VALIDATE\')">Validar</button>'+
+      '<button class="btn danger" onclick="reviewAction(\'remittance\',\''+r.id+'\',\'DISCARD\')">Descartar</button>');
+  }
+  $('reviewList').innerHTML=html||'<div class="card">No quedan decisiones históricas pendientes.</div>';
+  $('reviewDecisions').innerHTML=(reviewData.decisions||[]).slice(0,20).map(x=>'<div class="doc-card"><div class="row"><div><div class="title">'+esc(x.action)+' · '+esc(x.item_type)+'</div><div class="meta">'+dt(x.decided_at)+'</div></div></div>'+(x.reason?'<div class="meta" style="margin-top:7px">'+esc(x.reason)+'</div>':'')+'</div>').join('')||'<div class="card">Todavía no hay decisiones registradas.</div>';
+}
+async function reviewAction(type,id,action){
+  let reason=action==='DISCARD'?prompt('Motivo para descartar este registro:'):'Validado por Ignacio desde la app';
+  if(action==='DISCARD'&&!reason)return;
+  try{await api('/review/'+type+'/'+id+'/action',{method:'POST',body:JSON.stringify({action,reason})});toast(action==='VALIDATE'?'Registro validado':'Registro descartado');await refresh();await loadReview()}catch(e){toast(e.message,true)}
+}
+function reviewCorrectAccount(id){
+  let m=(reviewData?.account_movements||[]).find(x=>x.id===id);if(!m)return;
+  let val=prompt('Saldo correcto en pesos. Positivo = deuda; negativo = saldo a favor:',String(Number(m.signed_cents||0)/100));if(val===null)return;
+  let n=Number(String(val).replace(',','.'));if(!Number.isFinite(n))return toast('Importe inválido',true);
+  let reason=prompt('Motivo / evidencia de la corrección:')||'Corrección validada por Ignacio';
+  api('/review/account/'+id+'/action',{method:'POST',body:JSON.stringify({action:'CORRECT',corrected_signed_cents:Math.round(n*100),reason})}).then(async()=>{toast('Saldo corregido y validado');await refresh();await loadReview()}).catch(e=>toast(e.message,true));
+}
+function reviewEditClient(id){
+  let c=clients.find(x=>x.id===id);if(!c)return;
+  openModal('Corregir cliente','<div class="label">Nombre</div><input id="rcn" class="field" value="'+esc(c.name||'')+'"><div class="label">Dirección</div><input id="rca" class="field" value="'+esc(c.address||'')+'"><div class="label">Ciudad</div><input id="rcc" class="field" value="'+esc(c.city||'')+'"><div class="label">Teléfono</div><input id="rcp" class="field" value="'+esc(c.phone||'')+'"><div class="label">Nota / evidencia</div><textarea id="rcnote" class="field">'+esc(c.notes||'')+'</textarea><button id="rcsave" class="btn primary full" style="margin-top:12px">Guardar y validar</button>');
+  $('rcsave').onclick=async()=>{try{await api('/clients/'+id,{method:'PATCH',body:JSON.stringify({name:$('rcn').value,address:$('rca').value||null,city:$('rcc').value||null,phone:$('rcp').value||null,notes:$('rcnote').value||null})});await api('/review/client/'+id+'/action',{method:'POST',body:JSON.stringify({action:'VALIDATE',reason:'Cliente corregido y validado por Ignacio'})});closeModal();toast('Cliente corregido y validado');await refresh();await loadReview()}catch(e){toast(e.message,true)}}
+function reviewMergeClient(id){
+  let opts=(reviewData?.merge_candidates||[]).filter(x=>x.id!==id&&x.active).map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join('');
+  openModal('Unificar cliente','<div class="admin-note">Todo el historial se moverá al cliente elegido. El registro viejo quedará como alias y no se borra.</div><div class="label">Cliente correcto</div><select id="rmt" class="field">'+opts+'</select><div class="label">Motivo</div><input id="rmr" class="field" placeholder="Ej: mismo cliente, duplicado por mayúsculas"><button id="rms" class="btn primary full" style="margin-top:12px">Unificar</button>');
+  $('rms').onclick=async()=>{try{await api('/review/client/'+id+'/action',{method:'POST',body:JSON.stringify({action:'MERGE',target_id:$('rmt').value,reason:$('rmr').value||'Duplicado histórico validado'})});closeModal();toast('Clientes unificados');await refresh();await loadReview()}catch(e){toast(e.message,true)}}
+function reviewCorrectStock(id){
+  let m=(reviewData?.stock_movements||[]).find(x=>x.id===id);if(!m)return;
+  let options='<option value="">— Sin depósito —</option>'+depots.map(d=>'<option value="'+d.id+'">'+esc(d.name)+'</option>').join('');
+  openModal('Corregir depósito histórico','<div class="label">Origen</div><select id="rso" class="field">'+options+'</select><div class="label">Destino</div><select id="rsd" class="field">'+options+'</select><div class="label">Motivo / evidencia</div><input id="rsr" class="field" placeholder="Qué confirma esta ubicación"><button id="rss" class="btn primary full" style="margin-top:12px">Guardar corrección</button>');
+  $('rso').value=m.source_depot_id||'';$('rsd').value=m.dest_depot_id||'';
+  $('rss').onclick=async()=>{try{await api('/review/stock/'+id,{method:'PATCH',body:JSON.stringify({source_depot_id:$('rso').value||null,dest_depot_id:$('rsd').value||null,reason:$('rsr').value||'Ubicación corregida por Ignacio'})});closeModal();toast('Ubicación corregida; falta validar');await loadReview()}catch(e){toast(e.message,true)}}
+}
+
 function renderOrders(){
   if(!$('ordersList')) return;
   const all=[
