@@ -320,10 +320,12 @@ function reviewEditClient(id){
   let c=clients.find(x=>x.id===id);if(!c)return;
   openModal('Corregir cliente','<div class="label">Nombre</div><input id="rcn" class="field" value="'+esc(c.name||'')+'"><div class="label">Dirección</div><input id="rca" class="field" value="'+esc(c.address||'')+'"><div class="label">Ciudad</div><input id="rcc" class="field" value="'+esc(c.city||'')+'"><div class="label">Teléfono</div><input id="rcp" class="field" value="'+esc(c.phone||'')+'"><div class="label">Nota / evidencia</div><textarea id="rcnote" class="field">'+esc(c.notes||'')+'</textarea><button id="rcsave" class="btn primary full" style="margin-top:12px">Guardar y validar</button>');
   $('rcsave').onclick=async()=>{try{await api('/clients/'+id,{method:'PATCH',body:JSON.stringify({name:$('rcn').value,address:$('rca').value||null,city:$('rcc').value||null,phone:$('rcp').value||null,notes:$('rcnote').value||null})});await api('/review/client/'+id+'/action',{method:'POST',body:JSON.stringify({action:'VALIDATE',reason:'Cliente corregido y validado por Ignacio'})});closeModal();toast('Cliente corregido y validado');await refresh();await loadReview()}catch(e){toast(e.message,true)}}
+}
 function reviewMergeClient(id){
   let opts=(reviewData?.merge_candidates||[]).filter(x=>x.id!==id&&x.active).map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join('');
   openModal('Unificar cliente','<div class="admin-note">Todo el historial se moverá al cliente elegido. El registro viejo quedará como alias y no se borra.</div><div class="label">Cliente correcto</div><select id="rmt" class="field">'+opts+'</select><div class="label">Motivo</div><input id="rmr" class="field" placeholder="Ej: mismo cliente, duplicado por mayúsculas"><button id="rms" class="btn primary full" style="margin-top:12px">Unificar</button>');
   $('rms').onclick=async()=>{try{await api('/review/client/'+id+'/action',{method:'POST',body:JSON.stringify({action:'MERGE',target_id:$('rmt').value,reason:$('rmr').value||'Duplicado histórico validado'})});closeModal();toast('Clientes unificados');await refresh();await loadReview()}catch(e){toast(e.message,true)}}
+}
 function reviewCorrectStock(id){
   let m=(reviewData?.stock_movements||[]).find(x=>x.id===id);if(!m)return;
   let options='<option value="">— Sin depósito —</option>'+depots.map(d=>'<option value="'+d.id+'">'+esc(d.name)+'</option>').join('');
