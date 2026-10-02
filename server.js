@@ -12,6 +12,7 @@ app.all("/api/*", async (req, res) => {
     const suffix = req.originalUrl.slice(4);
     const headers = { "content-type": "application/json" };
     if (req.headers.cookie) headers.cookie = req.headers.cookie;
+    if (req.headers.authorization) headers.authorization = req.headers.authorization;
 
     const init = { method: req.method, headers };
     if (!["GET", "HEAD"].includes(req.method)) {
