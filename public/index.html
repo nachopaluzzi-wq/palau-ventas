@@ -200,7 +200,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:
 <div id="modal" class="modal hidden"><div class="sheet"><button class="close" onclick="closeModal()">×</button><h3 id="modalTitle"></h3><div id="modalBody"></div></div></div>
 <div id="toast" class="toast hidden"></div>
 <script>
-const API='/api'; let me=null,clients=[],branches=[],products=[],depots=[],accounts=[],remits=[],budgets=[],collections=[],stock=[],transfers=[],cart={},tDraft=[];
+const API='https://ouelrddwbmqwabnviyro.supabase.co/functions/v1/api'; let me=null,clients=[],branches=[],products=[],depots=[],accounts=[],remits=[],budgets=[],collections=[],stock=[],transfers=[],cart={},tDraft=[];
 const $=id=>document.getElementById(id), money=c=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(Number(c||0)/100), esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])), dt=s=>s?new Date(s).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'}):'—';
 function toast(m,e=false){let t=$('toast');t.textContent=m;t.className='toast'+(e?' err':'');setTimeout(()=>t.className='toast hidden',3200)}
 async function api(p,o={}){const token=localStorage.getItem('palau_session_token')||'';const headers={'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(o.headers||{})};let r=await fetch(API+p,{credentials:'same-origin',headers,...o}),d={};try{d=await r.json()}catch{}if(!r.ok){let x=new Error(d.error||'Error');x.status=r.status;x.data=d;throw x}return d}
