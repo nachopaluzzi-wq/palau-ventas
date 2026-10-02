@@ -222,4 +222,4 @@ function newUser(){let ds=depots.map(x=>'<option value="'+x.id+'">'+esc(x.name)+
 async function loadAudit(){if(me.role!=='ADMIN')return;let d=await api('/audit');$('auditList').innerHTML=(d.data||[]).map(a=>'<div class="doc-card"><div class="row"><div><div class="title">'+esc(a.action)+' · '+esc(a.entity_type)+'</div><div class="meta">'+dt(a.occurred_at)+'</div></div></div>'+(a.reason?'<div class="meta" style="margin-top:7px">'+esc(a.reason)+'</div>':'')+'</div>').join('')||'<div class="card">Sin eventos.</div>'}
 boot();
 </script>
-</body></html>
+<!-- palau-session-v2 -->\n</body></html>
