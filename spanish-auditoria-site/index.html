@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#244d85">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Spanish Auditoría</title>
+<link rel="stylesheet" href="https://pgtrdfukjkigvmsrcxlr.supabase.co/functions/v1/spanish-auditoria-style?v=24">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+.hide{display:none!important}
+body{margin:0;background:#f4f6f8;color:#111827;font:14px system-ui,-apple-system,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;background:#fff;border-bottom:1px solid #e5e7eb}
+header h1{margin:0;font-size:21px;font-weight:800}
+.wrap{max-width:1200px;margin:auto;padding:18px 16px 112px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;justify-content:space-around;gap:4px;padding:8px;background:white;border-top:1px solid #e5e7eb}
+nav button{flex:1;min-height:52px}
+#auth{max-width:470px;margin:12vh auto 0;padding:24px;background:#fff;border:1px solid #e5e7eb;border-radius:18px}
+button{cursor:pointer}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script defer src="https://pgtrdfukjkigvmsrcxlr.supabase.co/functions/v1/spanish-auditoria-appjs?v=20261031_render_v189"></script>
+</head>
+<body>
+<header><h1>Spanish Auditoría</h1><button type="button" id="logout" class="hide">Cerrar sesión</button></header>
+<div id="auth" aria-live="polite"><h2>Acceso administrativo</h2><p>Preparando acceso por PIN…</p></div>
+<div id="app" class="hide"><main class="wrap">
+<section id="p-home">
+<div class="section-title"><h2>Inicio</h2></div>
+<div class="quick-actions"><button type="button" onclick="closeForm()">Registrar cierre de caja</button></div>
+<div id="kpis" class="grid kpis"></div>
+<div id="recent" class="card"></div>
+<div id="salesMonths"></div>
+</section>
+<section id="p-caja" class="hide">
+<div class="section-title"><h2>Control de caja</h2></div>
+<div class="row"><label>Desde <input id="from" type="date"></label><label>Hasta <input id="to" type="date"></label></div>
+<div id="closes"></div>
+</section>
+<section id="p-proveedores" class="hide">
+<div class="section-title"><h2>Proveedores</h2></div>
+<input id="sq" type="search" placeholder="Buscar proveedor" aria-label="Buscar proveedor">
+<div id="suppliers"></div>
+</section>
+<section id="p-iva" class="hide">
+<div class="section-title"><h2>IVA y facturación</h2></div>
+<div id="billKpis"></div><div id="billMonths"></div>
+</section>
+<section id="p-sueldos" class="hide">
+<div class="section-title"><h2>Liquidaciones</h2></div>
+<div id="payTable"></div>
+</section>
+</main></div>
+<nav id="nav" class="hide" aria-label="Navegación">
+<button class="active" type="button" onclick="go('home',this)"><span class="navico"></span><span class="navtxt">Inicio</span></button>
+<button type="button" onclick="go('caja',this)"><span class="navico"></span><span class="navtxt">Caja</span></button>
+<button type="button" onclick="go('proveedores',this)"><span class="navico"></span><span class="navtxt">Proveedores</span></button>
+<button type="button" onclick="go('iva',this)"><span class="navico"></span><span class="navtxt">IVA</span></button>
+<button type="button" onclick="go('sueldos',this)"><span class="navico"></span><span class="navtxt">Sueldos</span></button>
+</nav>
+<div id="modal"></div>
+<script>window.addEventListener("load",()=>{if(typeof window.supabase==="undefined"){const a=document.getElementById("auth");if(a)a.innerHTML="<h2>Sin conexión con Supabase</h2><p>Revisá internet y recargá la página.</p>";}});</script>
+</body>
+</html>
