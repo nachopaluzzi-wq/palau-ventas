@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Spanish · Fichaje</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;background:#f3f4f6}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:520px;margin:auto;padding:18px 14px 36px}
+.brand{text-align:center;padding:10px 0 18px}.brand b{font-size:30px}.brand div{font-size:13px;color:#6b7280;margin-top:3px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.hide{display:none!important}.muted{color:#6b7280}.small{font-size:12px}.center{text-align:center}
+.staff{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.staff button{min-height:62px;background:#fff;border:1px solid #d1d5db;border-radius:15px;font-size:16px;font-weight:800;padding:10px}
+input,button{font:inherit}.pin{width:100%;min-height:56px;border:1px solid #d1d5db;border-radius:13px;text-align:center;font-size:28px;letter-spacing:10px;padding:8px;margin:10px 0}
+.primary{width:100%;min-height:64px;border:0;border-radius:15px;background:#111827;color:#fff;font-size:19px;font-weight:900}
+.secondary{width:100%;min-height:48px;border:1px solid #d1d5db;border-radius:13px;background:#fff;font-weight:800;margin-top:9px}
+.name{font-size:27px;font-weight:900}.state{margin:12px 0;padding:12px;background:#f8fafc;border-radius:13px}
+.ok{color:#087443}.msg{font-size:13px;margin-top:9px}.success{background:#effcf5;border:1px solid #a7e2c4;color:#087443}
+.footer{text-align:center;color:#9ca3af;font-size:11px;margin-top:16px}
+@media(max-width:380px){.staff{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="brand"><b>Spanish</b><div>Fichaje de personal</div></div>
+ <div id="listCard" class="card">
+   <h2 style="margin-top:0">Elegí tu nombre</h2>
+   <div id="staff" class="staff"></div>
+   <div id="listMsg" class="msg muted"></div>
+ </div>
+ <div id="pinCard" class="card hide">
+   <div class="center"><div id="pinName" class="name"></div><div class="small muted">Ingresá tu PIN</div></div>
+   <input id="pin" class="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+   <button class="primary" onclick="signin()">Continuar</button>
+   <button class="secondary" onclick="backToList()">Volver</button>
+   <div id="pinMsg" class="msg muted"></div>
+ </div>
+ <div id="punchCard" class="card hide">
+   <div class="center"><div id="who" class="name"></div></div>
+   <div id="state" class="state"></div>
+   <button id="punchBtn" class="primary" onclick="punch()"></button>
+   <button class="secondary" onclick="backToList()">Cancelar</button>
+   <div id="punchMsg" class="msg muted"></div>
+ </div>
+ <div id="doneCard" class="card success hide center">
+   <div id="doneText" class="name" style="font-size:22px"></div>
+   <div id="doneSub" class="small" style="margin-top:6px"></div>
+ </div>
+ <div class="footer">Acceso exclusivo para fichaje · No permite consultar sueldos, caja ni administración. La hora se registra en el servidor.</div>
+</div>
+<script>
+const E='https://pgtrdfukjkigvmsrcxlr.supabase.co/functions/v1/spanish-auditoria-fichaje';
+const personalEmployeeId=new URL(location.href).searchParams.get('empleado')||'';
+const personalLinkValid=!personalEmployeeId||/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(personalEmployeeId);
+let token='',selected=null,current=null;
+const q=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const fmtTime=v=>v?new Intl.DateTimeFormat('es-AR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Argentina/Buenos_Aires'}).format(new Date(v)):'—';
+const turnLabel=v=>v==='MORNING'?'Mañana':v==='AFTERNOON'?'Tarde':'';
+
+async function api(action,body={}){
+ const r=await fetch(E,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,token,...body})});
+ let x={};try{x=await r.json()}catch{}
+ if(!r.ok)throw new Error(x.error||'No se pudo completar la operación.');
+ return x
+}
+function show(id){['listCard','pinCard','punchCard','doneCard'].forEach(x=>q(x).classList.toggle('hide',x!==id))}
+async function loadEmployees(){
+ q('listMsg').textContent='Cargando…';
+ try{
+  if(!personalLinkValid)throw new Error('Enlace personal inválido. Solicitá uno nuevo a Spanish.');
+  if(personalEmployeeId){
+   let only=await api('employee',{employee_id:personalEmployeeId});
+   if(!only.employee)throw new Error('Este empleado aún no tiene PIN habilitado.');
+   q('staff').innerHTML='';
+   choose(only.employee.id,only.employee.name);
+   return
+  }
+  let x=await api('employees');
+  q('staff').innerHTML=x.employees.map(e=>'<button data-id="'+esc(e.id)+'" data-name="'+esc(e.name)+'" onclick="choose(this.dataset.id,this.dataset.name)">'+esc(e.name)+'</button>').join('');
+  q('listMsg').textContent=x.employees.length?'':'No hay empleados con PIN habilitado.';
+ }catch(e){q('listMsg').textContent=e.message}
+}
+function choose(id,name){
+ selected={id,name};q('pinName').textContent=name;q('pin').value='';q('pinMsg').textContent='';show('pinCard');setTimeout(()=>q('pin').focus(),100)
+}
+function backToList(){
+ token='';selected=null;current=null;q('pin').value='';q('pinMsg').textContent='';q('punchMsg').textContent='';
+ if(personalEmployeeId){show('listCard');loadEmployees();return}
+ show('listCard')
+}
+async function signin(){
+ if(!selected)return backToList();
+ let p=q('pin').value.trim();
+ if(!/^\d{4}$/.test(p))return q('pinMsg').textContent='Ingresá los 4 dígitos.';
+ q('pinMsg').textContent='Verificando…';
+ try{
+  let x=await api('login',{employee_id:selected.id,pin:p});
+  token=x.token;q('pin').value='';await status()
+ }catch(e){q('pinMsg').textContent=e.message}
+}
+async function status(){
+ try{
+  let x=await api('status');current=x;q('who').textContent=x.employee.name;
+  let o=x.open_entry;
+  if(o){
+   q('state').innerHTML='<b class="ok">Entrada registrada '+fmtTime(o.clock_in_at)+'</b><div class="small muted">'+turnLabel(o.actual_shift_code)+(o.scheduled_end_at?' · salida habitual '+fmtTime(o.scheduled_end_at):'')+'</div>';
+   q('punchBtn').textContent='FICHAR SALIDA'
+  }else{
+   q('state').innerHTML='<b>Sin entrada abierta</b><div class="small muted">La hora se toma automáticamente al tocar el botón.</div>';
+   q('punchBtn').textContent='FICHAR ENTRADA'
+  }
+  q('punchMsg').textContent='';show('punchCard')
+ }catch(e){backToList();q('listMsg').textContent=e.message}
+}
+function punchPosition(){
+ return new Promise((resolve,reject)=>{
+  if(!navigator.geolocation)return reject(new Error('Este dispositivo no permite obtener ubicación.'));
+  navigator.geolocation.getCurrentPosition(
+   p=>resolve({lat:p.coords.latitude,lon:p.coords.longitude,
+     accuracy_m:p.coords.accuracy,timestamp_ms:p.timestamp}),
+   e=>reject(new Error(e.code===1?'Permití el acceso a la ubicación para fichar.':
+      e.code===3?'No se pudo determinar la ubicación a tiempo. Probá nuevamente.':
+      'GPS no disponible. Activá la ubicación y volvé a intentar.')),
+   {enableHighAccuracy:true,maximumAge:0,timeout:20000}
+  )
+ })
+}
+async function punch(){
+ q('punchBtn').disabled=true;q('punchMsg').textContent='Registrando…';
+ try{
+  q('punchMsg').textContent='Verificando ubicación (solo en este fichaje)…';
+  let policy=await api('policy');
+  let geo=policy.geofence_enabled?await punchPosition():null;
+  q('punchMsg').textContent='Registrando fichaje…';
+  let x=await api('punch',{geo}),r=x.result,isIn=r.action==='CLOCK_IN';
+  q('doneText').textContent=isIn?'Entrada registrada':'Salida registrada';
+  let extra=!isIn&&Number(r.overtime_minutes||0)>0?' · extra '+Math.floor(r.overtime_minutes/60)+' h '+(r.overtime_minutes%60)+' min':'';
+  q('doneSub').textContent=fmtTime(isIn?r.clock_in_at:r.clock_out_at)+(r.shift_changed?' · cambio de turno detectado':'')+extra;
+  show('doneCard');token='';selected=null;current=null;
+  setTimeout(()=>{show('listCard');loadEmployees()},1500)
+ }catch(e){q('punchMsg').textContent=e.message}
+ finally{q('punchBtn').disabled=false}
+}
+loadEmployees();
+</script>
+</body></html>
