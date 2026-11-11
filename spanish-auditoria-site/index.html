@@ -66,5 +66,45 @@ button{cursor:pointer}
 </nav>
 <div id="modal"></div>
 <script>window.addEventListener("load",()=>{if(typeof window.supabase==="undefined"){const a=document.getElementById("auth");if(a)a.innerHTML="<h2>Sin conexión con Supabase</h2><p>Revisá internet y recargá la página.</p>";}});</script>
+
+<style>
+#saQuickActions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+#saQuickActions button{min-height:42px}
+#saItemSearch{display:flex;align-items:center;gap:8px;margin:12px 0;padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}
+#saItemSearch input{border:0;outline:0;flex:1;min-width:0;font:inherit}
+</style>
+<script>
+/* UI-only enhancement: preserves all original handlers and accounting data. */
+(function(){
+ function install(){
+  const section=document.getElementById('p-proveedores');
+  if(section&&!document.getElementById('saQuickActions')){
+   const bar=document.createElement('div');bar.id='saQuickActions';
+   const btn=document.createElement('button');btn.type='button';btn.className='primary';btn.textContent='▦ Cargar comprobante · QR / foto / manual';
+   btn.onclick=function(){
+    const candidates=[...section.querySelectorAll('button')].filter(b=>/cargar boleta|escanear qr|nuevo comprobante|cargar comprobante/i.test(b.textContent||'')&&!bar.contains(b));
+    if(candidates.length){candidates[0].click();return;}
+    const search=section.querySelector('#sq');if(search){search.focus();search.scrollIntoView({block:'center'});}
+    alert('Elegí el proveedor para cargar el comprobante con QR, foto o manual.');
+   };
+   bar.appendChild(btn);const title=section.querySelector('.section-title');(title||section).after(bar);
+  }
+  const modal=document.getElementById('modal');if(!modal)return;
+  const targets=[...modal.querySelectorAll('table')].filter(t=>/producto|artículo|cantidad|unidades/i.test((t.querySelector('thead')||t).textContent||''));
+  for(const table of targets){
+   if(table.dataset.saSearchInstalled)continue;
+   const context=table.closest('.card,dialog,.modal')||table.parentElement;
+   if(!context||!/vendid|producto|artículo/i.test(context.textContent||''))continue;
+   table.dataset.saSearchInstalled='1';
+   const box=document.createElement('label');box.id='saItemSearch';box.innerHTML='<span aria-hidden="true">🔍</span><input type="search" placeholder="Buscar producto por nombre" aria-label="Buscar producto vendido">';
+   table.before(box);
+   const input=box.querySelector('input');
+   input.addEventListener('input',()=>{const q=input.value.toLocaleLowerCase('es').trim();for(const row of table.querySelectorAll('tbody tr'))row.hidden=!!q&&!row.textContent.toLocaleLowerCase('es').includes(q);});
+  }
+ }
+ let queued=false;const obs=new MutationObserver(()=>{if(queued)return;queued=true;setTimeout(()=>{queued=false;install()},150)});
+ document.addEventListener('DOMContentLoaded',()=>{install();obs.observe(document.body,{childList:true,subtree:true})});
+})();
+</script>
 </body>
 </html>
