@@ -82,12 +82,27 @@ button{cursor:pointer}
    const bar=document.createElement('div');bar.id='saQuickActions';
    const btn=document.createElement('button');btn.type='button';btn.className='primary';btn.textContent='▦ Cargar comprobante · QR / foto / manual';
    btn.onclick=function(){
-    const candidates=[...section.querySelectorAll('button')].filter(b=>/cargar boleta|escanear qr|nuevo comprobante|cargar comprobante/i.test(b.textContent||'')&&!bar.contains(b));
-    if(candidates.length){candidates[0].click();return;}
-    const search=section.querySelector('#sq');if(search){search.focus();search.scrollIntoView({block:'center'});}
-    alert('Elegí el proveedor para cargar el comprobante con QR, foto o manual.');
+    // Open the actual unified invoice form; never search for a secondary button.
+    if(typeof window.documentForm!=='function'){
+      alert('No se cargó el formulario de comprobantes. Actualizá la página e intentá nuevamente.');
+      return;
+    }
+    try{window.documentForm();}catch(err){
+      console.error('No se pudo abrir el formulario de comprobantes',err);
+      alert('No se pudo abrir el formulario. No se guardó ningún comprobante.');
+    }
    };
    bar.appendChild(btn);const title=section.querySelector('.section-title');(title||section).after(bar);
+  }
+  // Apply the search term to supplier cards after every asynchronous render.
+  const search=section?.querySelector('#sq');
+  const supplierRoot=section?.querySelector('#suppliers');
+  if(search&&supplierRoot){
+    const query=search.value.trim().toLocaleLowerCase('es-AR');
+    for(const card of supplierRoot.querySelectorAll(':scope > .card')){
+      const label=card.querySelector('h3,h4,strong')?.textContent||card.textContent||'';
+      card.hidden=!!query&&!label.toLocaleLowerCase('es-AR').includes(query);
+    }
   }
   const modal=document.getElementById('modal');if(!modal)return;
   const targets=[...modal.querySelectorAll('table')].filter(t=>/producto|artículo|cantidad|unidades/i.test((t.querySelector('thead')||t).textContent||''));
