@@ -91,5 +91,35 @@ button{cursor:pointer}
  document.addEventListener('DOMContentLoaded',()=>{install();obs.observe(document.body,{childList:true,subtree:true})});
 })();
 </script>
+
+<style id="sa-mobile-selection-fix">
+@media(max-width:600px){
+  #modal button.sa-mobile-selection-action,
+  #modal [role="button"].sa-mobile-selection-action{
+    position:relative!important;inset:auto!important;transform:none!important;
+    display:block!important;box-sizing:border-box!important;
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    margin:10px 0!important;white-space:normal!important;overflow-wrap:anywhere!important;
+  }
+}
+</style>
+<script>
+(function(){
+  function fixSelectionAction(){
+    var root=document.getElementById('modal');if(!root||innerWidth>600)return;
+    root.querySelectorAll('button,[role="button"]').forEach(function(el){
+      var label=(el.innerText||el.textContent||'').replace(/\\s+/g,' ').trim();
+      if(!/selecci[oó]n\\s*[·•]/i.test(label))return;
+      el.classList.add('sa-mobile-selection-action');
+    });
+  }
+  var queued=false;
+  new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;fixSelectionAction()})})
+    .observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+  document.addEventListener('DOMContentLoaded',fixSelectionAction);
+  window.addEventListener('resize',fixSelectionAction);
+  fixSelectionAction();
+})();
+</script>
 </body>
 </html>
