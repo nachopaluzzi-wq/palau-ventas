@@ -45,7 +45,7 @@ function grantAuditGrace(){
  setAuditCookie(tok);
  document.cookie=AUDIT_GRACE_COOKIE+'='+expires+'; Path=/; Max-Age=600; Secure; SameSite=Strict';
 }
-let tok='',sb,cls=[],hist=[],sups=[],mov=[],supplierAllocations=[],supplierInvoiceCredits=[],bills=[],bclients=[],emps=[],adv=[],ded=[],pay=[],advAccounts=[],schedules=[],timeEntries=[],weeklyPayrolls=[],vacations=[],vacBalances=[],employeeAccess=[],timeDebts=[],pendingParsedClose=null,pendingSourceFile=null,assistantProposal={},assistantFiles=[],billPhotoFile=null,billOcrText='',supAliases=[],billPreferredSupplier='',spanishImports=[],qrStream=null,qrScanTimer=null,qrScanBusy=false,pendingFiscalQr=null,qrEvidenceFile=null;
+let tok='',sb,cls=[],hist=[],sups=[],mov=[],supplierAllocations=[],supplierInvoiceCredits=[],bills=[],bclients=[],emps=[],adv=[],ded=[],pay=[],advAccounts=[],schedules=[],timeEntries=[],weeklyPayrolls=[],vacations=[],vacBalances=[],employeeAccess=[],timeDebts=[],attendanceOverrides=[],pendingParsedClose=null,pendingSourceFile=null,assistantProposal={},assistantFiles=[],billPhotoFile=null,billOcrText='',supAliases=[],billPreferredSupplier='',spanishImports=[],qrStream=null,qrScanTimer=null,qrScanBusy=false,pendingFiscalQr=null,qrEvidenceFile=null;
 const money=n=>new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n||0)),fmt=d=>d?new Date(d+'T12:00:00').toLocaleDateString('es-AR'):'',pct=n=>n==null?'—':Number(n).toLocaleString('es-AR',{maximumFractionDigits:2})+'%';
 function client(){sb=supabase.createClient(U,K,{global:{headers:tok?{'X-Audit-Session':tok}:{}}})}client();
 function enhanceNumericInputs(root=document){
@@ -3660,11 +3660,12 @@ async function loadPeople(){
   sb.from('audit_employee_vacations').select('*').order('entitlement_year',{ascending:false}).order('start_date',{ascending:false}),
   sb.from('audit_employee_vacation_balances').select('*'),
   sb.from('audit_employee_access').select('employee_id,active'),
-  sb.from('audit_employee_time_debt').select('*')
+  sb.from('audit_employee_time_debt').select('*'),
+  sb.from('audit_attendance_overrides').select('employee_id,work_date,status').gte('work_date',cutoff)
  ]);
  let err=rs.map(x=>x.error).find(Boolean);
  if(err)return A(err.message);
- [emps,adv,ded,pay,advAccounts,schedules,timeEntries,weeklyPayrolls,vacations,vacBalances,employeeAccess,timeDebts]=rs.map(x=>x.data||[]);
+ [emps,adv,ded,pay,advAccounts,schedules,timeEntries,weeklyPayrolls,vacations,vacBalances,employeeAccess,timeDebts,attendanceOverrides]=rs.map(x=>x.data||[]);
  renderPeople()
 }
 function minsText(n){
@@ -3904,11 +3905,41 @@ function renderAdvancesDashboard(){
  }).join(''):'<div class="small muted">Todavía no hay movimientos.</div>')+'</details>'
 }
 
+function attendanceAlertDateParts(){
+ const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Buenos_Aires',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+ const out={};parts.forEach(p=>{if(p.type!=='literal')out[p.type]=p.value});
+ const d=new Date(out.year+'-'+out.month+'-'+out.day+'T12:00:00Z');
+ return {date:out.year+'-'+out.month+'-'+out.day,minutes:Number(out.hour||0)*60+Number(out.minute||0),isoWeekday:d.getUTCDay()===0?7:d.getUTCDay()};
+}
+function attendanceAlertInstall(){
+ const host=document.querySelector('#app main.wrap');
+ if(!host)return;
+ const old=document.getElementById('auditAttendanceAlert');if(old)old.remove();
+ const now=attendanceAlertDateParts(),rows=[];
+ (emps||[]).filter(e=>e.active).forEach(e=>{
+  const s=(schedules||[]).find(x=>x.employee_id===e.id&&Number(x.iso_weekday)===now.isoWeekday&&x.active&&x.work_start&&x.work_end);
+  if(!s)return;
+  const start=Number(String(s.work_start).slice(0,2))*60+Number(String(s.work_start).slice(3,5));
+  if(now.minutes<start)return;
+  if((attendanceOverrides||[]).some(o=>o.employee_id===e.id&&o.work_date===now.date&&o.status==='ABSENT'))return;
+  if((timeEntries||[]).some(t=>t.employee_id===e.id&&t.work_date===now.date&&t.clock_in_at&&!t.is_test))return;
+  rows.push({e,s})
+ });
+ if(!rows.length)return;
+ const box=document.createElement('section');box.id='auditAttendanceAlert';
+ box.innerHTML='<div class="audit-attendance-alert-head"><div><strong>Fichajes pendientes</strong><span>Hay turnos iniciados sin entrada registrada.</span></div><span class="audit-attendance-alert-count">'+rows.length+'</span></div>'+
+  rows.map(x=>'<div class="audit-attendance-alert-row"><div><b>'+esc(x.e.name)+'</b><small>Turno '+String(x.s.work_start).slice(0,5)+'–'+String(x.s.work_end).slice(0,5)+'</small></div><div class="audit-attendance-alert-actions"><button type="button" data-attendance-add="'+x.e.id+'">Corregir fichaje</button><button type="button" class="primary" data-attendance-absent="'+x.e.id+'">Marcar ausente</button></div></div>').join('');
+ host.prepend(box);
+ box.querySelectorAll('[data-attendance-absent]').forEach(b=>b.onclick=()=>window.auditV5Override(b.dataset.attendanceAbsent,'ABSENT',now.date));
+ box.querySelectorAll('[data-attendance-add]').forEach(b=>b.onclick=()=>window.auditV5Add(b.dataset.attendanceAdd,now.date));
+ if(!window._auditAttendanceAlertTimer)window._auditAttendanceAlertTimer=setInterval(()=>{if(TOKEN_OK.test(tok))attendanceAlertInstall()},60000)
+}
 function renderPeople(){
- if(personnelView==='staff'){renderPersonnelHome();return}
- if(personnelView==='advances'){renderAdvancesDashboard();return}
+ if(personnelView==='staff'){renderPersonnelHome();attendanceAlertInstall();return}
+ if(personnelView==='advances'){renderAdvancesDashboard();attendanceAlertInstall();return}
  renderPayrollTable();
- payTable.innerHTML=personnelNavigation()+payTable.innerHTML
+ payTable.innerHTML=personnelNavigation()+payTable.innerHTML;
+ attendanceAlertInstall()
 }
 
 /* Agrupación visual basada en los horarios ya cargados. No cambia la asignación ni los sueldos. */
