@@ -4003,7 +4003,7 @@ function staffPayBreakdown(w,e){
   (st?'<div class="small" style="color:'+st.text+';margin:0 0 8px;font-weight:650">'+esc(st.detail)+'</div>':'')+
   '<div class="row between" style="margin:5px 0"><span>Base · '+regularHours.toLocaleString('es-AR',{maximumFractionDigits:2})+' h × '+money(hourly)+'/h</span><b>'+money(base)+'</b></div>'+
   '<div class="row between" style="margin:5px 0"><span>Extras · '+minsText(extraMinutes)+'</span><b>+'+money(extra)+'</b></div>'+
-  (discounts?'<div class="row between"><span>Otros descuentos</span><b>−'+money(discounts)+'</b></div>':'')+
+  (discounts?'<div class="row between"><span>'+(w?.notes&&/Pago parcial ya entregado/i.test(w.notes)?'Pago parcial ya entregado':'Otros descuentos')+'</span><b>−'+money(discounts)+'</b></div>':'')+
   (advance?'<div class="row between"><span>Adelanto descontado</span><b>−'+money(advance)+'</b></div>':'')+
   '<div class="row between" style="padding-top:7px;margin-top:7px;border-top:1px solid #cbd5e1"><b>'+(w?.status==='PAID'?'Total registrado como pagado':'Total semanal')+'</b><b style="font-size:17px">'+money(net)+'</b></div>'+
   '<div class="small muted" style="margin-top:7px">'+(w?.status==='PAID'?'Registro interno; no acredita entrega de dinero.':'Las extras sólo afectan esta semana, no modifican la base habitual.')+'</div></div>';
@@ -4606,7 +4606,7 @@ function payrollDetail(id){
   '<div><span class="small muted">Horas extra</span><b>'+minsText(w.overtime_minutes)+'</b></div>'+
   '<div><span class="small muted">Base</span><b>'+money(w.base_amount)+'</b></div>'+
   '<div><span class="small muted">Extras $</span><b>'+money(w.overtime_amount)+'</b></div></div>'+
-  (Number(w.other_discounts||0)>0?'<div class="small">Otros descuentos: '+money(w.other_discounts)+'</div>':'')+
+  (Number(w.other_discounts||0)>0?'<div class="small">'+((w.notes&&/Pago parcial ya entregado/i.test(w.notes))?'Pago parcial ya entregado':'Otros descuentos')+': '+money(w.other_discounts)+'</div>':'')+
   (Number(w.advance_deduction||0)>0?'<div class="small">Descuento registrado: '+money(w.advance_deduction)+'</div>':'')+
   (w.notes?'<div class="calc small"><b>Observaciones anteriores</b><div>'+esc(w.notes)+'</div></div>':'')+
   '<div style="margin-top:8px"><b>Fichajes</b>'+attendance+'</div>'+
@@ -4617,7 +4617,7 @@ function payrollDetail(id){
   '<div style="font-weight:750;font-size:14px;margin:7px 0">Valor hora: '+money(hourlyRate)+' · Horas habituales: '+Number(w.regular_hours||0).toLocaleString('es-AR',{maximumFractionDigits:2})+' h</div>'+
   (e?.active&&w.status!=='PAID'?'<button type="button" data-id="'+esc(e.id)+'" style="min-height:39px;margin-bottom:7px" onclick="quickHourlyRateForm(this.dataset.id)">Editar valor hora</button>':'')+
   '<div class="small muted" style="margin:3px 0 8px">Base '+money(w.base_amount)+' + extras '+money(w.overtime_amount)+
-  (Number(w.other_discounts||0)>0?' − otros '+money(w.other_discounts):'')+'</div>'+
+  (Number(w.other_discounts||0)>0?' − '+((w.notes&&/Pago parcial ya entregado/i.test(w.notes))?'pago parcial entregado':'otros')+' '+money(w.other_discounts):'')+'</div>'+
   ledgerDetail+
   (entries.length&&w.overtime_source==='AUTO'?'<details style="margin:10px 0;border:1px solid #dbe3ec;border-radius:11px;padding:11px"><summary style="cursor:pointer;font-weight:650">Ajustar extras provenientes del fichaje</summary>'+extrasEdit+'</details>':extrasEdit)+action+breakdown+'</div>');
  if(ready||canEditExtras)weeklyPayCalc();
