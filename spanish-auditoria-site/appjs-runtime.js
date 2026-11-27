@@ -450,6 +450,7 @@ async function verifyAdminSession(candidate){
  }catch(_e){
   tok='';client();
   return false
+ }
 }
 async function signin(){
  const value=adminPinValue();
