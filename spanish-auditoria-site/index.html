@@ -25,6 +25,19 @@ button{cursor:pointer}
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="/appjs-runtime.js?v=20261126_fix1"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style id="sa-attendance-alert">
+#auditAttendanceAlert{margin:12px 0;border:1px solid #f3b74d;border-left:5px solid #e08b00;border-radius:14px;background:#fff9eb;color:#24344d;padding:12px;box-shadow:0 3px 14px rgba(25,45,75,.08)}
+.audit-attendance-alert-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.audit-attendance-alert-head strong{display:block;font-size:16px}
+.audit-attendance-alert-head span:not(.audit-attendance-alert-count){display:block;color:#65748b;font-size:12px;margin-top:2px}
+.audit-attendance-alert-count{background:#e08b00;color:#fff;border-radius:999px;min-width:27px;height:27px;display:grid;place-items:center;font-weight:800}
+.audit-attendance-alert-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #f4dfb5;padding:10px 0}
+.audit-attendance-alert-row b,.audit-attendance-alert-row small{display:block}
+.audit-attendance-alert-row small{color:#65748b;margin-top:2px}
+.audit-attendance-alert-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.audit-attendance-alert-actions button{min-height:40px;padding:8px 11px;border-radius:10px}
+@media(max-width:600px){.audit-attendance-alert-row{align-items:stretch;flex-direction:column}.audit-attendance-alert-actions{justify-content:stretch}.audit-attendance-alert-actions button{flex:1;min-width:0}}
+</style>
 </head>
 <body>
 <header><h1>Spanish Auditoría</h1><button type="button" id="logout" class="hide">Cerrar sesión</button></header>
