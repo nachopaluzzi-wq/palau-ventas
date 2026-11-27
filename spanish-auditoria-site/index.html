@@ -145,7 +145,7 @@ button{cursor:pointer}
 
 <style id="sa-mobile-bill-input-fix">
 /* Carga de boleta: el botón manual debe ser accesible y el visor QR debe ocupar la pantalla útil. */
-#manualBillDetails button[onclick="openManualBill()"]{
+#modal button[onclick="openManualBill()"]{
   display:block!important;
   width:100%!important;
   min-height:52px!important;
@@ -190,7 +190,7 @@ button{cursor:pointer}
     var summary=details.querySelector('summary');
     if(summary)summary.style.setProperty('display','block','important');
     var button=[...details.parentElement.querySelectorAll('button')].find(function(x){
-      return (x.textContent||'').trim()==='✎ Cargar boleta manualmente';
+      return /✎ (?:Cargar boleta manualmente|Carga manual)/.test((x.textContent||'').trim());
     });
     if(button){
       button.style.setProperty('display','block','important');
