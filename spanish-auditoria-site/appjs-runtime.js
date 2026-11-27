@@ -442,9 +442,14 @@ async function verifyAdminSession(candidate){
  if(!TOKEN_OK.test(candidate))return false;
  tok=candidate;client();
  try{
-  const r=await sb.rpc('audit_renew_admin_session');
+  // Una sesión vencida o una red lenta nunca debe dejar la pantalla en "Preparando acceso".
+  const pending=sb.rpc('audit_renew_admin_session');
+  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('session_timeout')),8000));
+  const r=await Promise.race([pending,timeout]);
   return !r.error&&!!r.data;
- }catch(_e){return false}
+ }catch(_e){
+  tok='';client();
+  return false
 }
 async function signin(){
  const value=adminPinValue();
@@ -2398,7 +2403,9 @@ function documentForm(id=''){
  M('<div class="manual-bill-compact">'+
  '<div class="manual-bill-head"><h3>Cargar boleta</h3><div class="small muted">QR fiscal o carga manual.</div></div>'+
  '<div style="border:1px solid #d9e1e9;border-radius:14px;padding:13px;margin:12px 0;background:#f8fafc">'+
- '<button class="primary" type="button" style="width:100%;min-height:60px;font-weight:800" onclick="startFiscalQrScanner()">▣ Escanear QR fiscal</button>'+ '<button type="button" style="width:100%;margin-top:9px;min-height:60px;font-weight:800" onclick="openManualBill()">✎ Cargar boleta manualmente</button>'+
+ '<button class="primary" type="button" style="width:100%;min-height:60px;font-weight:800" onclick="startFiscalQrScanner()">▣ QR con cámara</button>'+
+ '<button type="button" style="width:100%;margin-top:9px;min-height:52px;font-weight:800" onclick="openFiscalQrFile()">▣ QR desde foto/PDF</button>'+
+ '<button type="button" style="width:100%;margin-top:9px;min-height:52px;font-weight:800" onclick="openManualBill()">✎ Carga manual</button>'+
 
 
  ''+
@@ -2419,6 +2426,7 @@ function documentForm(id=''){
    '<div id="mbEvidence" class="small muted">Sin archivo adjunto.</div>'+
    '<label for="mbNotes">Observaciones</label><textarea id="mbNotes" rows="2" placeholder="Solo si necesitás agregar un dato"></textarea></div>'+
  '</details>'+
+ '<input id="qrFiscalFile" type="file" accept="image/*,application/pdf,.pdf" class="sr-file-input">'+
  '<input id="mbCamera" type="file" accept="image/*" capture="environment" class="sr-file-input">'+
  '<input id="mbFile" type="file" accept="image/*,application/pdf,.pdf" class="sr-file-input">'+
 
@@ -2426,7 +2434,9 @@ function documentForm(id=''){
  '</div></details>'+
  '</div>');
 
+ const qrFile=document.getElementById('qrFiscalFile');
  const cam=document.getElementById('mbCamera'),fi=document.getElementById('mbFile');
+ qrFile?.addEventListener('change',()=>fiscalQrFileSelected(qrFile.files&&qrFile.files[0]));
  cam.addEventListener('change',()=>manualBillEvidenceSelected(cam.files&&cam.files[0]));
  fi.addEventListener('change',()=>manualBillEvidenceSelected(fi.files&&fi.files[0]))
 }
