@@ -142,5 +142,66 @@ button{cursor:pointer}
   }
 }
 </style>
+
+<style id="sa-mobile-bill-input-fix">
+/* Carga de boleta: el botón manual debe ser accesible y el visor QR debe ocupar la pantalla útil. */
+#manualBillDetails button[onclick="openManualBill()"]{
+  display:block!important;
+  width:100%!important;
+  min-height:52px!important;
+  margin:10px 0!important;
+}
+@media(max-width:600px){
+  .qr-scanner{
+    width:100%!important;
+    aspect-ratio:4/3!important;
+    min-height:300px!important;
+    max-height:64dvh!important;
+  }
+  .qr-scanner video{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    transform:none!important;
+  }
+  .qr-frame{
+    left:8%!important;
+    right:8%!important;
+    top:12%!important;
+    bottom:12%!important;
+    border-width:3px!important;
+  }
+  .manual-bill-compact>div:first-of-type{
+    display:grid!important;
+    gap:8px!important;
+  }
+  .manual-bill-compact>div:first-of-type button{
+    min-height:52px!important;
+    margin:0!important;
+  }
+}
+</style>
+<script id="sa-mobile-bill-input-fix">
+(function(){
+  function restoreManualBill(){
+    var details=document.getElementById('manualBillDetails');
+    if(!details)return;
+    details.open=true;
+    var summary=details.querySelector('summary');
+    if(summary)summary.style.setProperty('display','block','important');
+    var button=[...details.parentElement.querySelectorAll('button')].find(function(x){
+      return (x.textContent||'').trim()==='✎ Cargar boleta manualmente';
+    });
+    if(button){
+      button.style.setProperty('display','block','important');
+      button.style.setProperty('width','100%','important');
+    }
+  }
+  var observer=new MutationObserver(restoreManualBill);
+  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','open']});
+  document.addEventListener('DOMContentLoaded',restoreManualBill);
+  restoreManualBill();
+})();
+</script>
 </body>
 </html>
