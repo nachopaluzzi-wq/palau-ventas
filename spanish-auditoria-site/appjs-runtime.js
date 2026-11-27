@@ -7810,7 +7810,7 @@ function spanishMonthStep(delta){
   var date=function(v){return v?String(v).slice(0,10):''};
   var fmt=function(v){return date(v).split('-').reverse().join('/')};
   var entries=function(w){return (typeof timeEntries!=='undefined'&&timeEntries||[]).filter(function(t){return String(t.employee_id)===String(w.employee_id)&&String(t.work_date||'')>=String(w.period_start||'')&&String(t.work_date||'')<=String(w.period_end||'')})};
-  var incident=function(t){return String(t.review_status||'')==='REVIEW'||!t.clock_in_at||!t.clock_out_at||t.auto_closed===true||String(t.close_source||'').toUpperCase()==='AUTO'};
+  var incident=function(t){return String(t.review_status||'')==='REVIEW'||!t.clock_in_at||!t.clock_out_at};
   var noSchedule=function(w){if(typeof employeeHasPin==='function'&&!employeeHasPin(w.employee_id))return false;return !(typeof schedules!=='undefined'&&(schedules||[]).some(function(s){return String(s.employee_id)===String(w.employee_id)}))};
   var legacy=function(w){return String(w.source_mode||'')==='LEGACY_CONFIRM'&&String(w.pay_date||'')<'2026-10-09'};
   var blocked=function(w){return String(w.status||'')!=='PAID'&&(Number(w.unresolved_count||0)>0||noSchedule(w)||legacy(w))};
@@ -7848,7 +7848,7 @@ function spanishMonthStep(delta){
   }
   function render(){
     if(typeof payTable==='undefined'||!payTable)return;
-    var all=rows(),shown=window.auditV5History===true?all:all.filter(function(w){return String(w.status||'')!=='PAID'&&!legacy(w)}),blockedRows=shown.filter(blocked),pending=shown.filter(function(w){return String(w.status||'')!=='PAID'}).length,reviewCount=shown.reduce(function(n,w){return n+Number(w.review_count||0)},0);
+    var all=rows(),shown=window.auditV5History===true?all:all.filter(function(w){return String(w.status||'')!=='PAID'&&!legacy(w)&&(!w.pay_date||String(w.pay_date)<=addDaysISO(localISODate(),1))}),blockedRows=shown.filter(blocked),pending=shown.filter(function(w){return String(w.status||'')!=='PAID'}).length,reviewCount=shown.reduce(function(n,w){return n+Number(w.review_count||0)},0);
     payTable.innerHTML=window.matchMedia('(max-width:760px)').matches?mobileMarkup(shown,blockedRows,pending,reviewCount):webMarkup(shown,blockedRows,pending,reviewCount);
     bind();
   }
