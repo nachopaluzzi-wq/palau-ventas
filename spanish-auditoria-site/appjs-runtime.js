@@ -7811,7 +7811,7 @@ function spanishMonthStep(delta){
   var fmt=function(v){return date(v).split('-').reverse().join('/')};
   var entries=function(w){return (typeof timeEntries!=='undefined'&&timeEntries||[]).filter(function(t){return String(t.employee_id)===String(w.employee_id)&&String(t.work_date||'')>=String(w.period_start||'')&&String(t.work_date||'')<=String(w.period_end||'')})};
   var incident=function(t){return String(t.review_status||'')==='REVIEW'||!t.clock_in_at||!t.clock_out_at||t.auto_closed===true||String(t.close_source||'').toUpperCase()==='AUTO'};
-  var noSchedule=function(w){return !(typeof schedules!=='undefined'&&(schedules||[]).some(function(s){return String(s.employee_id)===String(w.employee_id)}))};
+  var noSchedule=function(w){if(typeof employeeHasPin==='function'&&!employeeHasPin(w.employee_id))return false;return !(typeof schedules!=='undefined'&&(schedules||[]).some(function(s){return String(s.employee_id)===String(w.employee_id)}))};
   var legacy=function(w){return String(w.source_mode||'')==='LEGACY_CONFIRM'&&String(w.pay_date||'')<'2026-10-09'};
   var blocked=function(w){return String(w.status||'')!=='PAID'&&(Number(w.unresolved_count||0)>0||noSchedule(w)||legacy(w))};
   var rows=function(){return (typeof weeklyPayrolls!=='undefined'&&weeklyPayrolls||[]).slice().sort(function(a,b){return String(b.period_start||'').localeCompare(String(a.period_start||''))||String(emp(a.employee_id).name||'').localeCompare(String(emp(b.employee_id).name||''),'es')})};
@@ -7843,12 +7843,12 @@ function spanishMonthStep(delta){
   function bind(){
     payTable.querySelectorAll('[data-v5-open]').forEach(function(b){b.onclick=function(){var id=b.dataset.v5Open,w=(typeof weeklyPayrolls!=='undefined'&&weeklyPayrolls||[]).find(function(x){return String(x.id)===String(id)});if(w&&String(w.status||'')!=='PAID'&&!blocked(w)&&typeof payrollDetail==='function')payrollDetail(id);else openReview(id)}});
     var review=document.getElementById('v5Review'),history=document.getElementById('v5History');
-    if(review)review.onclick=function(){var first=rows().filter(blocked)[0];if(first)openReview(first.id);else toast('No hay incidencias pendientes.')};
+    if(review)review.onclick=function(){var first=rows().filter(function(w){return !legacy(w)&&blocked(w)})[0];if(first)openReview(first.id);else toast('No hay incidencias pendientes.')};
     if(history)history.onclick=function(){window.auditV5History=window.auditV5History!==true;render()};
   }
   function render(){
     if(typeof payTable==='undefined'||!payTable)return;
-    var all=rows(),shown=window.auditV5History===true?all:all.filter(function(w){return String(w.status||'')!=='PAID'}),blockedRows=shown.filter(blocked),pending=shown.filter(function(w){return String(w.status||'')!=='PAID'}).length,reviewCount=shown.reduce(function(n,w){return n+Number(w.review_count||0)},0);
+    var all=rows(),shown=window.auditV5History===true?all:all.filter(function(w){return String(w.status||'')!=='PAID'&&!legacy(w)}),blockedRows=shown.filter(blocked),pending=shown.filter(function(w){return String(w.status||'')!=='PAID'}).length,reviewCount=shown.reduce(function(n,w){return n+Number(w.review_count||0)},0);
     payTable.innerHTML=window.matchMedia('(max-width:760px)').matches?mobileMarkup(shown,blockedRows,pending,reviewCount):webMarkup(shown,blockedRows,pending,reviewCount);
     bind();
   }
