@@ -198,7 +198,7 @@ button{cursor:pointer}
     }
   }
   var observer=new MutationObserver(restoreManualBill);
-  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','open']});
+  observer.observe(document.documentElement,{subtree:true,childList:true});
   document.addEventListener('DOMContentLoaded',restoreManualBill);
   restoreManualBill();
 })();
