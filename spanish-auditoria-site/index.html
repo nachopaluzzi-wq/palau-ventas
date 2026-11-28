@@ -307,7 +307,7 @@ button{cursor:pointer}
  function fridayCarry(w){
   if(!w||String(w.status)==='PAID'||!['OPEN','DUE'].includes(String(w.status))||String(w.source_mode||'')==='LEGACY_CONFIRM')return null;
   var start=String(w.period_start||'').slice(0,10);
-  if(!start||new Date(start+'T12:00:00').getDay()!==6)return null;
+  if(start!=='2026-11-21'||new Date(start+'T12:00:00').getDay()!==6)return null;
   var date=typeof addDaysISO==='function'?addDaysISO(start,-1):'';
   if(!date||new Date(date+'T12:00:00').getDay()!==5)return null;
   var people=typeof weeklyPayrolls!=='undefined'?weeklyPayrolls:[];
