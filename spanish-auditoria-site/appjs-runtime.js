@@ -75,9 +75,34 @@ function enhanceNumericInputs(root=document){
   }
  })
 }
+function enhanceMobileInvoiceModal(){
+ const sheet=modal.querySelector('.sheet');if(!sheet)return;
+ const buttons=[...sheet.querySelectorAll('button')],text=b=>String(b?.textContent||'').replace(/\s+/g,' ').trim();
+ const bill=buttons.find(b=>/^\+?\s*boleta\b/i.test(text(b)));
+ const credit=buttons.find(b=>/^\+?\s*nota de crédito\b/i.test(text(b)));
+ const tabMap={pending:buttons.find(b=>/^pendientes(?:\s*\(|$)/i.test(text(b))),paid:buttons.find(b=>/^pagadas(?:\s*\(|$)/i.test(text(b))),history:buttons.find(b=>/^historial(?:\s|$)/i.test(text(b)))};
+ if(!bill||!credit||!tabMap.pending||!tabMap.paid||!tabMap.history)return;
+ sheet.classList.add('sa-invoice-list-modal');
+ const commonParent=items=>{
+  for(let n=items[0]?.parentElement;n&&n!==sheet;n=n.parentElement)if(items.every(x=>n.contains(x)))return n;
+  return null;
+ };
+ const actions=commonParent([bill,credit]);if(actions)actions.classList.add('sa-invoice-actions');
+ const tabs=commonParent(Object.values(tabMap));if(tabs)tabs.classList.add('sa-invoice-tabs');
+ sheet.querySelectorAll('*').forEach(status=>{
+  if(status.children.length||!/^pagado$/i.test(text(status)))return;
+  for(let row=status.parentElement;row&&row!==sheet;row=row.parentElement){
+   const valueText=text(row);
+   if(/\$\s*[\d.,]+/.test(valueText)&&/\b\d{1,2}\/\d{1,2}\/\d{4}\b/.test(valueText)){
+    row.classList.add('sa-invoice-entry');break;
+   }
+  }
+ });
+}
 function M(b){
  modal.innerHTML='<div class="modal" onclick="if(event.target===this)X()"><div class="sheet"><button class="x" onclick="X()">×</button>'+b+'</div></div>';
- enhanceNumericInputs(modal)
+ enhanceNumericInputs(modal);
+ enhanceMobileInvoiceModal()
 }
 function X(){stopFiscalQrScanner();modal.innerHTML=''}
 function A(s){alert(s)}
