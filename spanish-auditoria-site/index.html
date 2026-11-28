@@ -38,6 +38,56 @@ button{cursor:pointer}
 .audit-attendance-alert-actions button{min-height:40px;padding:8px 11px;border-radius:10px}
 @media(max-width:600px){.audit-attendance-alert-row{align-items:stretch;flex-direction:column}.audit-attendance-alert-actions{justify-content:stretch}.audit-attendance-alert-actions button{flex:1;min-width:0}}
 </style>
+<style id="sa-mobile-bill-visual-v2">
+/* Carga de boletas: controles visibles y QR grande en celular. */
+#modal .manual-bill-compact{width:100%;max-width:760px;margin:0 auto;padding-bottom:8px}
+#modal .manual-bill-compact .manual-bill-head{padding:4px 2px 10px}
+#modal .manual-bill-compact .manual-bill-head h3{font-size:24px;margin:0 0 4px}
+#modal .sa-bill-actions{display:grid!important;grid-template-columns:1fr;gap:10px;padding:12px!important;background:#f5f8fc!important;border:1px solid #cbd9e8!important;border-radius:16px!important}
+#modal .sa-bill-actions button{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;width:100%!important;min-height:58px!important;margin:0!important;padding:12px 16px!important;border-radius:13px!important;font-size:16px!important;text-align:left!important;white-space:normal!important}
+#modal .sa-bill-actions .sa-bill-icon{display:inline-grid!important;place-items:center!important;flex:0 0 34px!important;width:34px!important;height:34px!important;border-radius:10px!important;background:#e2edff!important;color:#1e5aa0!important;font-size:22px!important;font-weight:900!important;line-height:1!important}
+#modal .sa-bill-actions button.primary .sa-bill-icon{background:#fff!important;color:#245b9f!important}
+#modal .qr-scanner{position:relative!important;width:100%!important;height:min(68dvh,560px)!important;min-height:360px!important;max-height:none!important;aspect-ratio:auto!important;overflow:hidden!important;border-radius:18px!important;background:#091321!important;border:2px solid #cbd9e8!important;box-shadow:0 8px 25px rgba(15,38,70,.18)!important}
+#modal .qr-scanner video{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;transform:none!important}
+#modal .qr-frame{position:absolute!important;width:72%!important;height:72%!important;left:14%!important;right:auto!important;top:14%!important;bottom:auto!important;border:3px solid #35a8ff!important;border-radius:16px!important;box-shadow:0 0 0 9999px rgba(0,0,0,.22)!important;pointer-events:none!important}
+#modal #qrLiveStatus{margin-top:10px!important;min-height:44px!important;display:flex!important;align-items:center!important;padding:10px 12px!important;border-radius:12px!important}
+#modal .qr-verified-banner{margin:8px 0 14px!important;padding:12px!important;border-radius:12px!important}
+@media(max-width:600px){
+ #modal .sheet{width:100%!important;max-width:none!important;padding:16px 12px 28px!important}
+ #modal .manual-bill-compact .manual-bill-fields{grid-template-columns:1fr!important}
+ #modal .manual-bill-compact .manual-bill-field.full{grid-column:auto!important}
+ #modal .qr-scanner{height:62dvh!important;min-height:340px!important}
+ #modal .qr-frame{width:78%!important;height:62%!important;left:11%!important;top:19%!important}
+}
+</style>
+<script id="sa-mobile-bill-visual-v2-script">
+(function(){
+ function enhanceBillVisual(){
+  var root=document.getElementById('modal');if(!root)return;
+  var compact=root.querySelector('.manual-bill-compact');
+  if(compact){
+   var actions=[...compact.children].find(function(x){return x.querySelector&&x.querySelector('button[onclick*="startFiscalQrScanner"]')});
+   if(actions){
+    actions.classList.add('sa-bill-actions');
+    actions.querySelectorAll('button').forEach(function(btn){
+     if(btn.dataset.saBillVisual==='1')return;
+     var text=(btn.textContent||'').replace(/[▣✎]/g,'').trim(),icon=text.includes('cámara')?'⌗':text.includes('foto')?'▤':'✎';
+     btn.innerHTML='<span class="sa-bill-icon" aria-hidden="true">'+icon+'</span><span>'+text+'</span>';
+     btn.dataset.saBillVisual='1';
+    });
+   }
+  }
+  root.querySelectorAll('.doc-actions button').forEach(function(btn){
+   btn.style.setProperty('display','inline-flex','important');
+   btn.style.setProperty('align-items','center','important');
+   btn.style.setProperty('gap','7px','important');
+  });
+ }
+ var queued=false;
+ new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;enhanceBillVisual()})}).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+ document.addEventListener('DOMContentLoaded',enhanceBillVisual);enhanceBillVisual();
+})();
+</script>
 </head>
 <body>
 <header><h1>Spanish Auditoría</h1><button type="button" id="logout" class="hide">Cerrar sesión</button></header>
