@@ -4558,11 +4558,30 @@ function payrollDetail(id){
  const reviews=entries.filter(t=>t.review_status==='REVIEW');
  const hourlyRate=Number(w.hourly_rate??e?.hourly_rate??0);
  const allocationAudit=advanceLedgerFromPayroll(w);
+ const installmentMeta=a=>{
+  const match=String(a?.reason||'').match(/(\d+)\s+cuotas?\s+de\s*\$?\s*([\d.,]+)/i);
+  return match?{total:Number(match[1]),value:parseAmount(match[2])}:{total:0,value:0};
+ };
+ const priorInstallmentsPaid=a=>{
+  const target=String(w.status==='PAID'?(w.paid_date||w.pay_date):(w.pay_date||w.period_end)||'').slice(0,10);
+  const ownPrefix='payroll-'+w.id+'-advance-';
+  return ded.filter(d=>{
+   if(d.advance_id!==a.id||d.movement_type!=='PAYMENT'||Number(d.amount||0)<=0||String(d.request_key||'').startsWith(ownPrefix))return false;
+   const date=String(d.deduction_date||'').slice(0,10);
+   if(w.status==='PAID'){
+    if(date<target)return true;
+    return date===target&&!!w.paid_at&&String(d.created_at||'')<String(w.paid_at);
+   }
+   return date<=target;
+  }).length;
+ };
  const ledgerDetail=w.status==='PAID'&&Number(w.advance_deduction||0)>0?
   '<div class="calc" style="margin-top:10px"><b>Adelantos descontados · '+money(w.advance_deduction)+'</b>'+
   (allocationAudit.rows.length?allocationAudit.rows.map(x=>{
-    const a=advAccounts.find(t=>t.id===x.advance_id);
-    return '<div class="row between" style="margin-top:6px"><span>Adelanto '+fmt(a?.advance_date||x.deduction_date)+'</span><b>'+money(x.amount)+'</b></div>'
+    const a=advAccounts.find(t=>t.id===x.advance_id),meta=a?installmentMeta(a):{total:0,value:0};
+    const prior=a?priorInstallmentsPaid(a):0;
+    const quotaLabel=meta.total>0?' · Cuota '+(prior+1)+' de '+meta.total+' · '+money(Number(x.amount||0)):'';
+    return '<div class="row between" style="margin-top:6px"><span>Adelanto '+fmt(a?.advance_date||x.deduction_date)+quotaLabel+' · Imputada al confirmar esta liquidación</span><b>'+money(x.amount)+'</b></div>'
    }).join(''):'<div class="small bad">No se identificó la imputación en el historial.</div>')+
   (!allocationAudit.ok?'<div class="small bad">El descuento no concilia con los movimientos registrados. Revisar.</div>':'<div class="small ok">Descuento conciliado con la cuenta de adelantos.</div>')+
   '<button type="button" style="width:100%;min-height:42px;margin-top:9px" data-eid="'+esc(w.employee_id)+'" onclick="advancesForm(this.dataset.eid)">Ver cuenta e historial</button></div>':'';
@@ -4570,10 +4589,10 @@ function payrollDetail(id){
  const monthEnd=Number.isNaN(periodEndDate.getTime())?0:new Date(periodEndDate.getFullYear(),periodEndDate.getMonth()+1,0).getDate();
  const isLastWeekOfMonth=!!monthEnd&&periodEndDate.getDate()>=monthEnd-6;
  const automaticPlans=oa.map(a=>{
-  const match=String(a.reason||'').match(/(\d+)\s+cuotas?\s+de\s*\$?\s*([\d.,]+)/i);
-  const totalInstallments=match?Number(match[1]):0;
-  const quotaValue=match?parseAmount(match[2]):0;
-  const paidCount=ded.filter(d=>d.advance_id===a.id&&d.movement_type==='PAYMENT'&&Number(d.amount||0)>0).length;
+  const meta=installmentMeta(a);
+  const totalInstallments=meta.total;
+  const quotaValue=meta.value;
+  const paidCount=priorInstallmentsPaid(a);
   const quotaNumber=paidCount+1;
   const planned=isLastWeekOfMonth&&totalInstallments>0&&quotaValue>0&&paidCount<totalInstallments?Math.min(Number(a.balance||0),quotaValue):0;
   return {a,totalInstallments,quotaValue,paidCount,quotaNumber,planned};
@@ -4586,7 +4605,7 @@ function payrollDetail(id){
    const a=plan.a;
    const planned=Number(w.advance_deduction||0)>0?Math.min(Math.max(0,Number(a.balance||0)),autoRemaining):plan.planned;
    autoRemaining=Math.max(0,autoRemaining-planned);
-   const quotaLabel=plan.totalInstallments>0?' · Cuota '+plan.quotaNumber+' de '+plan.totalInstallments+' · '+money(plan.quotaValue):'';
+   const quotaLabel=plan.totalInstallments>0?' · Próxima cuota '+plan.quotaNumber+' de '+plan.totalInstallments+' · '+money(plan.quotaValue):'';
    const scheduled=planned>0?'<div class="small ok" style="margin:5px 0">Programada automáticamente para esta liquidación: '+money(planned)+'</div>':'';
    return '<div style="margin-top:9px"><label style="display:block;margin-bottom:4px">Adelanto '+fmt(a.advance_date)+' · Saldo '+money(a.balance)+quotaLabel+'</label>'+scheduled+
    '<input type="text" inputmode="decimal" class="wpAdvanceAmount" data-advance-id="'+esc(a.id)+'" value="'+esc(decimalInputValue(planned))+'" style="width:100%;min-height:45px" oninput="weeklyPayCalc()" aria-label="Descuento del adelanto '+esc(fmt(a.advance_date))+'"></div>'
