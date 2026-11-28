@@ -4566,10 +4566,15 @@ function payrollDetail(id){
    }).join(''):'<div class="small bad">No se identificó la imputación en el historial.</div>')+
   (!allocationAudit.ok?'<div class="small bad">El descuento no concilia con los movimientos registrados. Revisar.</div>':'<div class="small ok">Descuento conciliado con la cuenta de adelantos.</div>')+
   '<button type="button" style="width:100%;min-height:42px;margin-top:9px" data-eid="'+esc(w.employee_id)+'" onclick="advancesForm(this.dataset.eid)">Ver cuenta e historial</button></div>':'';
+ const autoDeduction=Math.max(0,Number(w.advance_deduction||0));
+ let autoRemaining=autoDeduction;
  const loanInput=oa.length?
-  '<div style="margin:10px 0"><b>Adelantos pendientes · '+money(oa.reduce((n,a)=>n+Number(a.balance||0),0))+'</b><div class="small muted">Indicá el descuento antes de liquidar. Si dejás $0, el sistema te pedirá confirmación.</div>'+oa.map(a=>
-   '<div style="margin-top:9px"><label style="display:block;margin-bottom:4px">Adelanto '+fmt(a.advance_date)+' · Saldo '+money(a.balance)+'</label>'+
-   '<input type="text" inputmode="decimal" class="wpAdvanceAmount" data-advance-id="'+esc(a.id)+'" value="0" style="width:100%;min-height:45px" oninput="weeklyPayCalc()" aria-label="Descuento del adelanto '+esc(fmt(a.advance_date))+'"></div>').join('')+'</div>':'';
+  '<div style="margin:10px 0"><b>Adelantos pendientes · '+money(oa.reduce((n,a)=>n+Number(a.balance||0),0))+'</b><div class="small muted">La cuota prevista de esta liquidación se carga automáticamente. Podés modificarla sólo si necesitás corregirla.</div>'+oa.map(a=>{
+   const planned=Math.min(Math.max(0,Number(a.balance||0)),autoRemaining);
+   autoRemaining=Math.max(0,autoRemaining-planned);
+   return '<div style="margin-top:9px"><label style="display:block;margin-bottom:4px">Adelanto '+fmt(a.advance_date)+' · Saldo '+money(a.balance)+'</label>'+
+   '<input type="text" inputmode="decimal" class="wpAdvanceAmount" data-advance-id="'+esc(a.id)+'" value="'+esc(decimalInputValue(planned))+'" style="width:100%;min-height:45px" oninput="weeklyPayCalc()" aria-label="Descuento del adelanto '+esc(fmt(a.advance_date))+'"></div>'
+  }).join('')+'</div>':'';
  const canEditExtras=!history&&['OPEN','DUE'].includes(w.status);
  const extrasEdit=canEditExtras?
   '<div style="border:1px solid #dbe3ec;border-radius:12px;padding:12px;margin:12px 0;background:#f8fafc">'+
