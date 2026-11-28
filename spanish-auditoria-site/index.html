@@ -303,6 +303,32 @@ button{cursor:pointer}
 </style>
 <script id="sa-payroll-mobile-accessibility-v1-script">
 (function(){
+ function localDate(v){try{return new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Argentina/Buenos_Aires',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(v))}catch(e){return ''}}
+ function fridayCarry(w){
+  if(!w||String(w.status)==='PAID'||!['OPEN','DUE'].includes(String(w.status))||String(w.source_mode||'')==='LEGACY_CONFIRM')return null;
+  var start=String(w.period_start||'').slice(0,10);
+  if(!start||new Date(start+'T12:00:00').getDay()!==6)return null;
+  var date=typeof addDaysISO==='function'?addDaysISO(start,-1):'';
+  if(!date||new Date(date+'T12:00:00').getDay()!==5)return null;
+  var people=typeof weeklyPayrolls!=='undefined'?weeklyPayrolls:[];
+  var previous=people.filter(function(p){return String(p.employee_id)===String(w.employee_id)&&String(p.status)==='PAID'&&String(p.period_start||'')<=date&&String(p.period_end||'')>=date&&localDate(p.paid_at)===date}).sort(function(a,b){return String(b.period_end||'').localeCompare(String(a.period_end||''))})[0];
+  if(!previous||!previous.paid_at)return null;
+  var rows=(typeof timeEntries!=='undefined'?timeEntries:[]).filter(function(t){return String(t.employee_id)===String(w.employee_id)&&String(t.work_date||'')===date&&t.clock_out_at&&!t.auto_closed&&Date.parse(t.clock_out_at)>Date.parse(previous.paid_at)});
+  if(!rows.length)return null;
+  var entries=rows.map(function(t){
+   var raw=Math.max(0,Math.round(Number(t.approved_overtime_minutes!=null?t.approved_overtime_minutes:t.overtime_minutes||0)));
+   var review=String(t.review_status||'')==='REVIEW';
+   var payable=review||raw<15?0:Math.floor((raw+15)/30)*30;
+   return {raw:raw,payable:payable,review:review};
+  });
+  return {date:date,previous:previous,entries:entries,raw:entries.reduce(function(n,x){return n+x.raw},0),minutes:entries.reduce(function(n,x){return n+x.payable},0),review:entries.some(function(x){return x.review})};
+ }
+ function carryText(c){
+  var d=typeof workDateLabel==='function'?workDateLabel(c.date):c.date;
+  if(c.review)return d+' · Marcación por revisar; no se sumó automáticamente.';
+  if(c.minutes>0)return d+' · '+(c.raw===c.minutes?minsText(c.minutes):(c.raw+' min reales → '+minsText(c.minutes)))+' extra posterior al pago anterior.';
+  return d+' · '+c.raw+' min reales; 0 min pagables (no alcanza el mínimo de 15).';
+ }
  function enhance(){
   var root=document.getElementById('modal'),sheet=root&&root.querySelector('.sheet');
   if(sheet&&sheet.querySelector('#wpExtraHours,#wpSave')){
@@ -310,24 +336,50 @@ button{cursor:pointer}
    sheet.classList.add('sa-payroll-detail-sheet');
    sheet.querySelectorAll('details').forEach(function(d){
     var summary=d.querySelector('summary'),label=(summary&&summary.textContent||'').replace(/\s+/g,' ').trim();
-    if(!/desglose, observaciones y fichajes/i.test(label))return;
-    d.classList.add('sa-payroll-breakdown');
-    d.open=true;
-    if(summary&&!summary.dataset.saLabel){summary.dataset.saLabel='1';summary.setAttribute('aria-label','Desglose semanal: tocar para contraer o volver a abrir');}
+    if(/desglose, observaciones y fichajes/i.test(label)){d.classList.add('sa-payroll-breakdown');d.open=true;if(summary&&!summary.dataset.saLabel){summary.dataset.saLabel='1';summary.setAttribute('aria-label','Desglose semanal: tocar para contraer o volver a abrir')}}
    });
+   var field=sheet.querySelector('#wpExtraHours'),payButton=sheet.querySelector('#wpSave');
+   if(field&&payButton&&!field.dataset.saFridayCheck){
+    field.dataset.saFridayCheck='1';
+    var w=(typeof weeklyPayrolls!=='undefined'?weeklyPayrolls:[]).find(function(x){return String(x.id)===String(field.dataset.id)});
+    var carry=fridayCarry(w);
+    if(carry&&carry.minutes>0&&String(w.overtime_source||'')==='AUTO'){
+     var current=Math.max(0,Math.round(Number(w.overtime_minutes||0))),next=current+carry.minutes;
+     field.value=(next/60).toFixed(2).replace('.',',').replace(/,00$/,'');
+     field.dataset.saFridayCarry=String(carry.minutes);
+     var note=document.createElement('div');note.className='sa-friday-carry-note';note.setAttribute('role','note');
+     note.innerHTML='<b>Extra del viernes pasado incorporada a la propuesta</b><div>'+carryText(carry)+'</div><div>Extras propias de esta semana: '+minsText(current)+' · Propuesta total: '+minsText(next)+'. Guardá el ajuste antes de liquidar.</div>';
+     field.insertAdjacentElement('afterend',note);
+     var reasonLabel=document.createElement('label');reasonLabel.setAttribute('for','wpExtraReason');reasonLabel.textContent='Motivo que quedará en el historial';
+     reasonLabel.style.cssText='display:block;margin-top:9px;font-weight:650';
+     var reason=document.createElement('textarea');reason.id='wpExtraReason';reason.rows=2;reason.value='Incluye extra del viernes '+carry.date+' posterior al pago anterior: '+minsText(carry.minutes)+'.';
+     reason.style.cssText='display:block;width:100%;min-height:58px;margin-top:5px;padding:9px;border:1px solid #cbd5e1;border-radius:9px;font:inherit';
+     note.insertAdjacentElement('afterend',reasonLabel);reasonLabel.insertAdjacentElement('afterend',reason);
+     var outer=field.closest('details');if(outer){outer.open=true;var os=outer.querySelector('summary');if(os)os.setAttribute('aria-label','Ajuste de extras: incluye extra pendiente del viernes anterior')}
+     if(typeof weeklyPayCalc==='function')weeklyPayCalc();
+    }else if(carry&&carry.raw>0){
+     var notice=document.createElement('div');notice.className='sa-friday-carry-note';notice.setAttribute('role','note');notice.innerHTML='<b>Control del viernes pasado</b><div>'+carryText(carry)+'</div>';
+     field.insertAdjacentElement('afterend',notice);
+    }
+   }
   }
-  var table=document.getElementById('payTable');
-  if(!table)return;
+  var table=document.getElementById('payTable');if(!table)return;
   table.querySelectorAll('.v5-row').forEach(function(row){
-   if(row.querySelector('.sa-v5-overtime'))return;
    var open=row.querySelector('[data-v5-open]'),w=open&&typeof weeklyPayrolls!=='undefined'&&weeklyPayrolls.find(function(x){return String(x.id)===String(open.dataset.v5Open)});
    if(!w)return;
-   var line=document.createElement('div');line.className='sa-v5-overtime';
-   var mins=Number(w.overtime_minutes||0),label=typeof minsText==='function'?minsText(mins):(Math.floor(mins/60)+' h '+(mins%60)+' min');
-   line.innerHTML='<span>Horas extra antes de liquidar</span><strong>'+label+'</strong>';
-   var bottom=row.querySelector('.v5-row-bottom');
-   if(bottom)row.insertBefore(line,bottom);else row.appendChild(line);
-   if(open&&!open.dataset.saActionLabel){open.dataset.saActionLabel='1';open.textContent=w.status==='PAID'?'Ver horas y desglose':'Ver horas y liquidar';}
+   if(!row.querySelector('.sa-v5-overtime')){
+    var line=document.createElement('div');line.className='sa-v5-overtime';
+    var mins=Number(w.overtime_minutes||0),label=typeof minsText==='function'?minsText(mins):(Math.floor(mins/60)+' h '+(mins%60)+' min');
+    line.innerHTML='<span>Horas extra de esta semana</span><strong>'+label+'</strong>';
+    var bottom=row.querySelector('.v5-row-bottom');if(bottom)row.insertBefore(line,bottom);else row.appendChild(line);
+   }
+   var carry=fridayCarry(w);
+   if(carry&&!row.querySelector('.sa-v5-friday-carry')){
+    var cLine=document.createElement('div');cLine.className='sa-v5-friday-carry';cLine.textContent='Viernes anterior · '+carryText(carry);
+    var own=row.querySelector('.sa-v5-overtime'),bottom=row.querySelector('.v5-row-bottom');
+    if(own)own.insertAdjacentElement('afterend',cLine);else if(bottom)row.insertBefore(cLine,bottom);else row.appendChild(cLine);
+   }
+   if(open&&!open.dataset.saActionLabel){open.dataset.saActionLabel='1';open.textContent=w.status==='PAID'?'Ver horas y desglose':'Ver horas y liquidar'}
   });
  }
  var queued=false;
