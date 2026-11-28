@@ -183,7 +183,7 @@ button{cursor:pointer}
   function fixSelectionAction(){
     var root=document.getElementById('modal');if(!root||innerWidth>600)return;
     root.querySelectorAll('button,[role="button"]').forEach(function(el){
-      var label=(el.innerText||el.textContent||'').replace(/\\s+/g,' ').trim();
+      var label=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
       if(!/selecci[oó]n\\s*[·•]/i.test(label))return;
       el.classList.add('sa-mobile-selection-action');
     });
@@ -276,6 +276,63 @@ button{cursor:pointer}
   observer.observe(document.documentElement,{subtree:true,childList:true});
   document.addEventListener('DOMContentLoaded',restoreManualBill);
   restoreManualBill();
+})();
+</script>
+
+<style id="sa-payroll-mobile-accessibility-v1">
+@media(max-width:760px){
+  /* La hoja de liquidación ocupa la pantalla útil y queda por encima de la navegación fija. */
+  #modal .modal.sa-payroll-detail-overlay{position:fixed!important;inset:0!important;z-index:5000!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;padding:env(safe-area-inset-top) 0 0!important}
+  #modal .sheet.sa-payroll-detail-sheet{position:relative!important;box-sizing:border-box!important;width:100%!important;max-width:680px!important;max-height:calc(100dvh - env(safe-area-inset-top))!important;height:auto!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding:18px 14px calc(28px + env(safe-area-inset-bottom))!important}
+  #modal .sa-payroll-detail-sheet>.x{position:sticky!important;top:0!important;float:right!important;z-index:20!important;display:grid!important;place-items:center!important;width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;margin:-4px -2px 2px 8px!important}
+  #modal .sa-payroll-breakdown{clear:both!important;margin-top:14px!important;border:1px solid #b9c9dc!important;border-radius:14px!important;background:#f7faff!important;padding:10px!important}
+  #modal .sa-payroll-breakdown>summary{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;min-height:52px!important;padding:10px 12px!important;border-radius:10px!important;background:#e9f1fb!important;color:#173b6d!important;font-size:15px!important;font-weight:800!important;line-height:1.3!important;cursor:pointer!important;touch-action:manipulation!important;position:relative!important;z-index:2!important}
+  #modal .sa-payroll-breakdown[open]>summary{margin-bottom:10px!important}
+  #modal .sa-payroll-detail-sheet #wpSave{position:relative!important;z-index:2!important;display:block!important;width:100%!important;min-height:58px!important;margin:12px 0 8px!important}
+  #payTable .v5-row .sa-v5-overtime{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin-top:9px!important;padding:8px 10px!important;border:1px solid #d5e2f0!important;border-radius:10px!important;background:#f4f8fd!important;color:#24466e!important;font-size:13px!important}
+  #payTable .v5-row .sa-v5-overtime strong{font-size:16px!important;color:#173b6d!important}
+  #payTable .v5-row .v5-row-bottom{position:relative!important;z-index:1!important}
+  #payTable .v5-row .v5-row-bottom .v5-btn{min-height:44px!important;font-size:13px!important}
+}
+@media(min-width:761px){
+  #modal .sa-payroll-breakdown>summary{min-height:44px!important;padding:10px 12px!important;cursor:pointer!important;touch-action:manipulation!important}
+}
+</style>
+<script id="sa-payroll-mobile-accessibility-v1-script">
+(function(){
+ function enhance(){
+  var root=document.getElementById('modal'),sheet=root&&root.querySelector('.sheet');
+  if(sheet&&sheet.querySelector('#wpExtraHours,#wpSave')){
+   var overlay=sheet.closest('.modal');if(overlay)overlay.classList.add('sa-payroll-detail-overlay');
+   sheet.classList.add('sa-payroll-detail-sheet');
+   sheet.querySelectorAll('details').forEach(function(d){
+    var summary=d.querySelector('summary'),label=(summary&&summary.textContent||'').replace(/\s+/g,' ').trim();
+    if(!/desglose, observaciones y fichajes/i.test(label))return;
+    d.classList.add('sa-payroll-breakdown');
+    d.open=true;
+    if(summary&&!summary.dataset.saLabel){summary.dataset.saLabel='1';summary.setAttribute('aria-label','Desglose semanal: tocar para contraer o volver a abrir');}
+   });
+  }
+  var table=document.getElementById('payTable');
+  if(!table)return;
+  table.querySelectorAll('.v5-row').forEach(function(row){
+   if(row.querySelector('.sa-v5-overtime'))return;
+   var open=row.querySelector('[data-v5-open]'),w=open&&typeof weeklyPayrolls!=='undefined'&&weeklyPayrolls.find(function(x){return String(x.id)===String(open.dataset.v5Open)});
+   if(!w)return;
+   var line=document.createElement('div');line.className='sa-v5-overtime';
+   var mins=Number(w.overtime_minutes||0),label=typeof minsText==='function'?minsText(mins):(Math.floor(mins/60)+' h '+(mins%60)+' min');
+   line.innerHTML='<span>Horas extra antes de liquidar</span><strong>'+label+'</strong>';
+   var bottom=row.querySelector('.v5-row-bottom');
+   if(bottom)row.insertBefore(line,bottom);else row.appendChild(line);
+   if(open&&!open.dataset.saActionLabel){open.dataset.saActionLabel='1';open.textContent=w.status==='PAID'?'Ver horas y desglose':'Ver horas y liquidar';}
+  });
+ }
+ var queued=false;
+ var observer=new MutationObserver(function(){if(queued)return;queued=true;requestAnimationFrame(function(){queued=false;enhance()})});
+ observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+ document.addEventListener('DOMContentLoaded',enhance);
+ window.addEventListener('resize',enhance);
+ enhance();
 })();
 </script>
 </body>
