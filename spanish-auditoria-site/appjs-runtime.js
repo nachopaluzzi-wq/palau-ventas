@@ -4570,7 +4570,7 @@ function payrollDetail(id){
  const monthEnd=Number.isNaN(periodEndDate.getTime())?0:new Date(periodEndDate.getFullYear(),periodEndDate.getMonth()+1,0).getDate();
  const isLastWeekOfMonth=!!monthEnd&&periodEndDate.getDate()>=monthEnd-6;
  const automaticPlans=oa.map(a=>{
-  const match=String(a.reason||'').match(/(\\d+)\\s+cuotas?\\s+de\\s*\\$?\\s*([\\d.,]+)/i);
+  const match=String(a.reason||'').match(/(\d+)\s+cuotas?\s+de\s*\$?\s*([\d.,]+)/i);
   const totalInstallments=match?Number(match[1]):0;
   const quotaValue=match?parseAmount(match[2]):0;
   const paidCount=ded.filter(d=>d.advance_id===a.id&&d.movement_type==='PAYMENT'&&Number(d.amount||0)>0).length;
